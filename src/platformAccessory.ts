@@ -52,6 +52,15 @@ export class UranusPlatformAccessory {
     const batteryService = this.accessory.addService(Service.Battery, `Battery level ${this.displayName}`);
     this.service.linkedServices = [temperatureService, humidityService, batteryService];
 
+    temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      .onGet(this.uranusStates.Temperature);
+    humidityService.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+      .onGet(this.uranusStates.Humidity);
+    batteryService.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
+      .onGet(this.getBattery.bind(this));
+    batteryService.getCharacteristic(this.platform.Characteristic.BatteryLevel)
+      .onGet(this.uranusStates.Battery);
+
     /**
      * Updating characteristics values asynchronously.
      */
@@ -111,6 +120,30 @@ export class UranusPlatformAccessory {
     return batteryLevel;
   }
 
+  async getBatteryLevel(): Promise<CharacteristicValue> {
+    const batteryLevel = this.uranusStates.Battery;
+
+    this.platform.log.debug('Get Characteristic BatteryLevel ->', batteryLevel);
+
+    return batteryLevel;
+  }
+
+  async getTemperature(): Promise<CharacteristicValue> {
+    const temperature = this.uranusStates.Temperature;
+
+    this.platform.log.debug('Get Characteristic Temperature ->', temperatur);
+
+    return temperature;
+  }
+
+  async getHumidity(): Promise<CharacteristicValue> {
+    const humidity = this.uranusStates.Humidity;
+
+    this.platform.log.debug('Get Characteristic Humidity ->', humidity);
+
+    return humidity;
+  }
+
   getSensorData(): {
     const overdaUrl = "https://overda-database.firebaseio.com/Devices/Uranus/" +
       `${this.accessory.context.device.serialNumber}-${this.accessory.context.device.pass}/Values.json`;
@@ -146,31 +179,31 @@ export class UranusPlatformAccessory {
    * Handle "SET" requests from HomeKit
    */
 
-  async setBattery(value: CharacteristicValue) {
-    // implement your own code to set the brightness
-    this.uranusStates.Battery = value as number;
-
-    this.platform.log.debug('Set Characteristic Battery -> ', value);
-  }
-  async setHumidity(value: CharacteristicValue) {
-    this.uranusStates.Humidity = value as number;
-
-    this.platform.log.debug('Set Characteristic Humidity -> ', value);
-  }
-  async setPressure(value: CharacteristicValue) {
-    this.uranusStates.Pressure = value as number;
-
-    this.platform.log.debug('Set Characteristic Pressure -> ', value);
-  }
-  async setVoc(value: CharacteristicValue) {
-    this.uranusStates.Voc = value as number;
-
-    this.platform.log.debug('Set Characteristic Voc -> ', value);
-  }
-  async setTemperature(value: CharacteristicValue) {
-    this.uranusStates.Temperature = value as number;
-
-    this.platform.log.debug('Set Characteristic Temperature -> ', value);
-  }
-
+  // async setBattery(value: CharacteristicValue) {
+  //   // implement your own code to set the brightness
+  //   this.uranusStates.Battery = value as number;
+  //
+  //   this.platform.log.debug('Set Characteristic Battery -> ', value);
+  // }
+  // async setHumidity(value: CharacteristicValue) {
+  //   this.uranusStates.Humidity = value as number;
+  //
+  //   this.platform.log.debug('Set Characteristic Humidity -> ', value);
+  // }
+  // async setPressure(value: CharacteristicValue) {
+  //   this.uranusStates.Pressure = value as number;
+  //
+  //   this.platform.log.debug('Set Characteristic Pressure -> ', value);
+  // }
+  // async setVoc(value: CharacteristicValue) {
+  //   this.uranusStates.Voc = value as number;
+  //
+  //   this.platform.log.debug('Set Characteristic Voc -> ', value);
+  // }
+  // async setTemperature(value: CharacteristicValue) {
+  //   this.uranusStates.Temperature = value as number;
+  //
+  //   this.platform.log.debug('Set Characteristic Temperature -> ', value);
+  // }
+  //
 }
