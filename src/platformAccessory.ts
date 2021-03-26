@@ -145,8 +145,11 @@ export class UranusPlatformAccessory {
   }
 
   getSensorData(): {
-    const overdaUrl = "https://overda-database.firebaseio.com/Devices/Uranus/" +
-      `${this.accessory.context.device.serialNumber}-${this.accessory.context.device.pass}/Values.json`;
+    const overdaUrl = `https://overda-database.firebaseio.com/Devices/Uranus/
+      ${this.accessory.context.device.serialNumber}
+      -
+      ${this.accessory.context.device.pass}
+      /Values.json`;
     let rawData = '';
     let parsedData = '';
 
