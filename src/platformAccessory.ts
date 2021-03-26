@@ -1,6 +1,6 @@
 import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-
 import { UranusHomebridgePlatform } from './platform';
+import https from 'https';
 
 /**
  * Platform Accessory
@@ -112,11 +112,12 @@ export class UranusPlatformAccessory {
   }
 
   getSensorData(): {
-    const overdaUrl = 'https://overda-database.firebaseio.com/Devices/Uranus/' +
+    const overdaUrl = "https://overda-database.firebaseio.com/Devices/Uranus/" +
       `${this.accessory.context.device.serialNumber}-${this.accessory.context.device.pass}/Values.json`;
     let rawData = '';
+    let parsedData = '';
 
-    http.get(overdaUrl, (res) => {
+    https.get(overdaUrl, (res) => {
       res.setEncoding('utf8');
       res.on('data', (data) => {
         raw_data += data;
@@ -125,12 +126,15 @@ export class UranusPlatformAccessory {
         this.log(error);
       });
       res.on('end', () => {
-        return JSON.parse(rawData);
+        parsedData = JSON.parse(rawData);
       });
     }
-  };
+
+    return parsedData;
+  }
+
   async updateStates(): Promise<void> {
-    const latestData = getSensorData();
+    const data = getSensorData();
     this.uranusStates.Battery = parseFloat(data.b) * 100;
     this.uranusStates.Humidity = data.h;
     this.uranusStates.Pressure = data.p;
