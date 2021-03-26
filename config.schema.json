@@ -8,7 +8,7 @@
       "name": {
         "title": "Name",
         "type": "string",
-        "required": true,
+        "required": false,
         "default": "Overda Uranus Platform"
       },
       "updateInterval": {
@@ -28,7 +28,8 @@
           "serialNumber": {
             "title": "Uranus Serial Number",
             "type": "string",
-            "placeholder": "URN-000000"
+            "placeholder": "URN-000000",
+            "required": true
           },
           "pass": {
             "title": "Uranus Sensor PIN",
@@ -36,6 +37,7 @@
             "placeholder": "0000",
             "min": 4,
             "max": 6
+            "required": true
           },
           "displayName": {
             "title": "Uranus Sensor Name",
