@@ -1,6 +1,6 @@
 {
   "private": true,
-  "displayName": "Plugin Name",
+  "displayName": "Overda Uranus Homebridge Plugin",
   "name": "homebridge-overda-uranus",
   "version": "1.0.0",
   "description": "Exposes sensors data from Uranus air-monitor station.",
@@ -32,7 +32,9 @@
     "air quality",
     "air monitor"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "https": "^1.0.0"
+  },
   "devDependencies": {
     "@types/node": "^14.14.31",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
