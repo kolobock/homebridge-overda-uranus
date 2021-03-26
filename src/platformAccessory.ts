@@ -9,13 +9,15 @@ import https from 'https';
  */
 export class UranusPlatformAccessory {
   private service: Service;
+
   private uranusStates = {
     Battery: 100,
     Humidity: 40,
     Pressure: 1000,
     Voc: 25,
-    Temperature: 20
+    Temperature: 20,
   };
+
   private category = PlatformAccessory.Categories.SENSOR;
 
   constructor(
@@ -88,17 +90,17 @@ export class UranusPlatformAccessory {
     let IAQ;
 
     if (voc <= 50) {
-      IAQ = this.platform.Characteristic.AirQuality.EXCELLENT
+      IAQ = this.platform.Characteristic.AirQuality.EXCELLENT;
     } else if (voc <= 100) {
-      IAQ = this.platform.Characteristic.AirQuality.GOOD
+      IAQ = this.platform.Characteristic.AirQuality.GOOD;
     } else if (voc <= 150) {
-      IAQ = this.platform.Characteristic.AirQuality.FAIR
+      IAQ = this.platform.Characteristic.AirQuality.FAIR;
     } else if (voc <= 200) {
-      IAQ = this.platform.Characteristic.AirQuality.INFERIOR
+      IAQ = this.platform.Characteristic.AirQuality.INFERIOR;
     } else if (voc <= 300) {
-      IAQ = this.platform.Characteristic.AirQuality.POOR
+      IAQ = this.platform.Characteristic.AirQuality.POOR;
     } else {
-      IAQ = this.platform.Characteristic.AirQuality.UNKNOWN
+      IAQ = this.platform.Characteristic.AirQuality.UNKNOWN;
     }
 
     this.platform.log.debug('Get Characteristic AirQuality ->', IAQ);
@@ -144,7 +146,7 @@ export class UranusPlatformAccessory {
     return humidity;
   }
 
-  getSensorData(): {
+  getSensorData(): Promise<string> {
     const overdaUrl = `https://overda-database.firebaseio.com/Devices/Uranus/
       ${this.accessory.context.device.serialNumber}
       -
@@ -156,7 +158,7 @@ export class UranusPlatformAccessory {
     https.get(overdaUrl, (res) => {
       res.setEncoding('utf8');
       res.on('data', (data) => {
-        raw_data += data;
+        rawData += data;
       });
       res.on('error', (error) => {
         this.log(error);
@@ -164,7 +166,7 @@ export class UranusPlatformAccessory {
       res.on('end', () => {
         parsedData = JSON.parse(rawData);
       });
-    }
+    });
 
     return parsedData;
   }
