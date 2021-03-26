@@ -1,105 +1,64 @@
 import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 
-import { ExampleHomebridgePlatform } from './platform';
+import { UranusHomebridgePlatform } from './platform';
 
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class ExamplePlatformAccessory {
+export class UranusPlatformAccessory {
   private service: Service;
-
-  /**
-   * These are just used to create a working example
-   * You should implement your own code to track the state of your accessory
-   */
-  private exampleStates = {
-    On: false,
-    Brightness: 100,
+  private uranusStates = {
+    Battery: 100,
+    Humidity: 40,
+    Pressure: 1000,
+    Voc: 25,
+    Temperature: 20
   };
+  private category = PlatformAccessory.Categories.SENSOR;
 
   constructor(
-    private readonly platform: ExampleHomebridgePlatform,
+    private readonly platform: UranusHomebridgePlatform,
     private readonly accessory: PlatformAccessory,
   ) {
 
+    this.displayName = accessory.context.device.displayName;
+    this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
+
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Default-Manufacturer')
-      .setCharacteristic(this.platform.Characteristic.Model, 'Default-Model')
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, 'Default-Serial');
-
-    // get the LightBulb service if it exists, otherwise create a new LightBulb service
-    // you can create multiple services for each accessory
-    this.service = this.accessory.getService(this.platform.Service.Lightbulb) || this.accessory.addService(this.platform.Service.Lightbulb);
+      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Overda')
+      .setCharacteristic(this.platform.Characteristic.Model, 'Uranus')
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, 'v1')
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.serialNumber);
 
     // set the service name, this is what is displayed as the default name on the Home app
-    // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.exampleDisplayName);
+    // in this example we are using the name we stored in the `accessory.context` in the `discoverSensors` method.
+    if (!this.service) {
+      this.service = new Service(Service.AirQualitySensor, `IAQ ${this.displayName}`);
+    }
+    this.service.setCharacteristic(this.platform.Characteristic.Name, `IAQ ${this.displayName}`);
 
-    // each service must implement at-minimum the "required characteristics" for the given service type
-    // see https://developers.homebridge.io/#/service/Lightbulb
+    this.service.getCharacteristic(this.platform.Characteristic.AirQuality)
+      .onGet(this.getIAQ.bind(this));
+    this.service.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
+      .onGet(this.getBattery.bind(this));
+    this.service.getCharacteristic(this.platform.Characteristic.VOCDensity)
+      .onGet(this.uranusStates.Voc);
 
-    // register handlers for the On/Off Characteristic
-    this.service.getCharacteristic(this.platform.Characteristic.On)
-      .onSet(this.setOn.bind(this))                // SET - bind to the `setOn` method below
-      .onGet(this.getOn.bind(this));               // GET - bind to the `getOn` method below
-
-    // register handlers for the Brightness Characteristic
-    this.service.getCharacteristic(this.platform.Characteristic.Brightness)
-      .onSet(this.setBrightness.bind(this));       // SET - bind to the 'setBrightness` method below
-
-    /**
-     * Creating multiple services of the same type.
-     *
-     * To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
-     * when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-     * this.accessory.getService('NAME') || this.accessory.addService(this.platform.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE_ID');
-     *
-     * The USER_DEFINED_SUBTYPE must be unique to the platform accessory (if you platform exposes multiple accessories, each accessory
-     * can use the same sub type id.)
-     */
-
-    // Example: add two "motion sensor" services to the accessory
-    const motionSensorOneService = this.accessory.getService('Motion Sensor One Name') ||
-      this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor One Name', 'YourUniqueIdentifier-1');
-
-    const motionSensorTwoService = this.accessory.getService('Motion Sensor Two Name') ||
-      this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor Two Name', 'YourUniqueIdentifier-2');
+    const temperatureService = this.accessory.addService(Service.TemperatureSensor, `Temperature ${this.displayName}`);
+    const humidityService = this.accessory.addService(Service.HumiditySensor, `Humidity ${this.displayName}`);
+    const batteryService = this.accessory.addService(Service.Battery, `Battery level ${this.displayName}`);
+    this.service.linkedServices = [temperatureService, humidityService, batteryService];
 
     /**
      * Updating characteristics values asynchronously.
-     *
-     * Example showing how to update the state of a Characteristic asynchronously instead
-     * of using the `on('get')` handlers.
-     * Here we change update the motion sensor trigger states on and off every 10 seconds
-     * the `updateCharacteristic` method.
-     *
      */
-    let motionDetected = false;
     setInterval(() => {
-      // EXAMPLE - inverse the trigger
-      motionDetected = !motionDetected;
-
       // push the new value to HomeKit
-      motionSensorOneService.updateCharacteristic(this.platform.Characteristic.MotionDetected, motionDetected);
-      motionSensorTwoService.updateCharacteristic(this.platform.Characteristic.MotionDetected, !motionDetected);
-
-      this.platform.log.debug('Triggering motionSensorOneService:', motionDetected);
-      this.platform.log.debug('Triggering motionSensorTwoService:', !motionDetected);
-    }, 10000);
-  }
-
-  /**
-   * Handle "SET" requests from HomeKit
-   * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
-   */
-  async setOn(value: CharacteristicValue) {
-    // implement your own code to turn your device on/off
-    this.exampleStates.On = value as boolean;
-
-    this.platform.log.debug('Set Characteristic On ->', value);
+      this.updateStates.bind(this);
+    }, this.updateInterval);
   }
 
   /**
@@ -115,27 +74,99 @@ export class ExamplePlatformAccessory {
    * @example
    * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
    */
-  async getOn(): Promise<CharacteristicValue> {
-    // implement your own code to check if the device is on
-    const isOn = this.exampleStates.On;
+  async getIAQ(): Promise<CharacteristicValue> {
+    const voc = this.uranusStates.Voc;
+    let IAQ;
 
-    this.platform.log.debug('Get Characteristic On ->', isOn);
+    if (voc <= 50) {
+      IAQ = this.platform.Characteristic.AirQuality.EXCELLENT
+    } else if (voc <= 100) {
+      IAQ = this.platform.Characteristic.AirQuality.GOOD
+    } else if (voc <= 150) {
+      IAQ = this.platform.Characteristic.AirQuality.FAIR
+    } else if (voc <= 200) {
+      IAQ = this.platform.Characteristic.AirQuality.INFERIOR
+    } else if (voc <= 300) {
+      IAQ = this.platform.Characteristic.AirQuality.POOR
+    } else {
+      IAQ = this.platform.Characteristic.AirQuality.UNKNOWN
+    }
 
-    // if you need to return an error to show the device as "Not Responding" in the Home app:
-    // throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+    this.platform.log.debug('Get Characteristic AirQuality ->', IAQ);
 
-    return isOn;
+    return IAQ;
+  }
+
+  async getBattery(): Promise<CharacteristicValue> {
+    let batteryLevel;
+
+    if (this.uranusStates.Battery < 20) {
+      batteryLevel = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
+    } else {
+      batteryLevel = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
+    }
+
+    this.platform.log.debug('Get Characteristic StatusLowBattery ->', IAQ);
+
+    return batteryLevel;
+  }
+
+  getSensorData(): {
+    const overdaUrl = 'https://overda-database.firebaseio.com/Devices/Uranus/' +
+      `${this.accessory.context.device.serialNumber}-${this.accessory.context.device.pass}/Values.json`;
+    let rawData = '';
+
+    http.get(overdaUrl, (res) => {
+      res.setEncoding('utf8');
+      res.on('data', (data) => {
+        raw_data += data;
+      });
+      res.on('error', (error) => {
+        this.log(error);
+      });
+      res.on('end', () => {
+        return JSON.parse(rawData);
+      });
+    }
+  };
+  async updateStates(): Promise<void> {
+    const latestData = getSensorData();
+    this.uranusStates.Battery = parseFloat(data.b) * 100;
+    this.uranusStates.Humidity = data.h;
+    this.uranusStates.Pressure = data.p;
+    this.uranusStates.Temperature = data.t;
+    this.uranusStates.Voc = data.v;
   }
 
   /**
    * Handle "SET" requests from HomeKit
-   * These are sent when the user changes the state of an accessory, for example, changing the Brightness
    */
-  async setBrightness(value: CharacteristicValue) {
-    // implement your own code to set the brightness
-    this.exampleStates.Brightness = value as number;
 
-    this.platform.log.debug('Set Characteristic Brightness -> ', value);
+  async setBattery(value: CharacteristicValue) {
+    // implement your own code to set the brightness
+    this.uranusStates.Battery = value as number;
+
+    this.platform.log.debug('Set Characteristic Battery -> ', value);
+  }
+  async setHumidity(value: CharacteristicValue) {
+    this.uranusStates.Humidity = value as number;
+
+    this.platform.log.debug('Set Characteristic Humidity -> ', value);
+  }
+  async setPressure(value: CharacteristicValue) {
+    this.uranusStates.Pressure = value as number;
+
+    this.platform.log.debug('Set Characteristic Pressure -> ', value);
+  }
+  async setVoc(value: CharacteristicValue) {
+    this.uranusStates.Voc = value as number;
+
+    this.platform.log.debug('Set Characteristic Voc -> ', value);
+  }
+  async setTemperature(value: CharacteristicValue) {
+    this.uranusStates.Temperature = value as number;
+
+    this.platform.log.debug('Set Characteristic Temperature -> ', value);
   }
 
 }
