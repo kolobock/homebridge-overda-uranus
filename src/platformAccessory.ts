@@ -18,7 +18,9 @@ export class UranusPlatformAccessory {
     Temperature: 20,
   };
 
-  private category = PlatformAccessory.Categories.SENSOR;
+  private category = this.platform.api.hap.Categories.SENSOR;
+  private displayName: string;
+  private updateInterval: number;
 
   constructor(
     private readonly platform: UranusHomebridgePlatform,
@@ -37,31 +39,30 @@ export class UranusPlatformAccessory {
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverSensors` method.
-    if (!this.service) {
-      this.service = new Service(Service.AirQualitySensor, `IAQ ${this.displayName}`);
-    }
-    this.service.setCharacteristic(this.platform.Characteristic.Name, `IAQ ${this.displayName}`);
+    this.service = this.accessory.getService(this.platform.Service.AirQualitySensor) ||
+      this.accessory.addService(this.platform.Service.AirQualitySensor, `IAQ ${this.displayName}`);
+    // this.service.setCharacteristic(this.platform.Characteristic.Name, `IAQ ${this.displayName}`);
 
     this.service.getCharacteristic(this.platform.Characteristic.AirQuality)
       .onGet(this.getIAQ.bind(this));
     this.service.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
       .onGet(this.getBattery.bind(this));
     this.service.getCharacteristic(this.platform.Characteristic.VOCDensity)
-      .onGet(this.uranusStates.Voc);
+      .onGet(this.getVoc.bind(this));
 
-    const temperatureService = this.accessory.addService(Service.TemperatureSensor, `Temperature ${this.displayName}`);
-    const humidityService = this.accessory.addService(Service.HumiditySensor, `Humidity ${this.displayName}`);
-    const batteryService = this.accessory.addService(Service.Battery, `Battery level ${this.displayName}`);
+    const temperatureService = this.accessory.addService(this.platform.Service.TemperatureSensor, `Temperature ${this.displayName}`);
+    const humidityService = this.accessory.addService(this.platform.Service.HumiditySensor, `Humidity ${this.displayName}`);
+    const batteryService = this.accessory.addService(this.platform.Service.Battery, `Battery level ${this.displayName}`);
     this.service.linkedServices = [temperatureService, humidityService, batteryService];
 
     temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-      .onGet(this.uranusStates.Temperature);
+      .onGet(this.getTemperature.bind(this));
     humidityService.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
-      .onGet(this.uranusStates.Humidity);
+      .onGet(this.getHumidity.bind(this));
     batteryService.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
       .onGet(this.getBattery.bind(this));
     batteryService.getCharacteristic(this.platform.Characteristic.BatteryLevel)
-      .onGet(this.uranusStates.Battery);
+      .onGet(this.getBatteryLevel.bind(this));
 
     /**
      * Updating characteristics values asynchronously.
@@ -117,7 +118,7 @@ export class UranusPlatformAccessory {
       batteryLevel = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
 
-    this.platform.log.debug('Get Characteristic StatusLowBattery ->', IAQ);
+    this.platform.log.debug('Get Characteristic StatusLowBattery ->', batteryLevel);
 
     return batteryLevel;
   }
@@ -133,9 +134,17 @@ export class UranusPlatformAccessory {
   async getTemperature(): Promise<CharacteristicValue> {
     const temperature = this.uranusStates.Temperature;
 
-    this.platform.log.debug('Get Characteristic Temperature ->', temperatur);
+    this.platform.log.debug('Get Characteristic Temperature ->', temperature);
 
     return temperature;
+  }
+
+  async getVoc(): Promise<CharacteristicValue> {
+    const voc = this.uranusStates.Voc;
+
+    this.platform.log.debug('Get Characteristic Voc ->', voc);
+
+    return voc;
   }
 
   async getHumidity(): Promise<CharacteristicValue> {
@@ -146,14 +155,14 @@ export class UranusPlatformAccessory {
     return humidity;
   }
 
-  getSensorData(): Promise<string> {
+  getSensorData() {
     const overdaUrl = `https://overda-database.firebaseio.com/Devices/Uranus/
       ${this.accessory.context.device.serialNumber}
       -
       ${this.accessory.context.device.pass}
       /Values.json`;
     let rawData = '';
-    let parsedData = '';
+    let parsedData;
 
     https.get(overdaUrl, (res) => {
       res.setEncoding('utf8');
@@ -161,7 +170,7 @@ export class UranusPlatformAccessory {
         rawData += data;
       });
       res.on('error', (error) => {
-        this.log(error);
+        this.platform.log.error(error.message);
       });
       res.on('end', () => {
         parsedData = JSON.parse(rawData);
@@ -172,7 +181,7 @@ export class UranusPlatformAccessory {
   }
 
   async updateStates(): Promise<void> {
-    const data = getSensorData();
+    const data = this.getSensorData();
     this.uranusStates.Battery = parseFloat(data.b) * 100;
     this.uranusStates.Humidity = data.h;
     this.uranusStates.Pressure = data.p;
