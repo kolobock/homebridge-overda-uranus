@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "OverdaUranusHomebridgePlugin",
   "pluginType": "platform",
   "singular": true,
   "schema": {
@@ -9,7 +9,41 @@
         "title": "Name",
         "type": "string",
         "required": true,
-        "default": "Example Dynamic Platform"
+        "default": "Overda Uranus Platform"
+      },
+      "updateInterval": {
+        "title": "Update Interval",
+        "type": "number",
+        "required": false,
+        "default": 150,
+        "min": 60,
+        "max": 300
+      },
+      "sensors": {
+        "title": "Uranus Sensors list",
+        "type": "array",
+        "required": true,
+        "default": "Uranus Dynamic Platform",
+        "items": {
+          "serialNumber": {
+            "title": "Uranus Serial Number",
+            "type": "string",
+            "placeholder": "URN-000000"
+          },
+          "pass": {
+            "title": "Uranus Sensor PIN",
+            "type": "string",
+            "placeholder": "0000",
+            "min": 4,
+            "max": 6
+          },
+          "displayName": {
+            "title": "Uranus Sensor Name",
+            "type": "string",
+            "required": false,
+            "default": "Uranus"
+          }
+        }
       }
     }
   }
