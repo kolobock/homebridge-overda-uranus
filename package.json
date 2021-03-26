@@ -1,8 +1,8 @@
 {
-  "private": true,
+  "private": false,
   "displayName": "Overda Uranus Homebridge Plugin",
   "name": "homebridge-overda-uranus",
-  "version": "1.0.0",
+  "version": "1.0.1-beta.0",
   "description": "Exposes sensors data from Uranus air-monitor station.",
   "license": "Apache-2.0",
   "repository": {
