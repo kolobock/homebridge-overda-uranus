@@ -163,7 +163,7 @@ export class UranusPlatformAccessory {
       -
       ${this.accessory.context.device.pass}
       /Values.json`;
-    this.platform.log.debug('overdaUrl: ', overdaUrl);
+    this.platform.log.info('overdaUrl: ', overdaUrl);
     let rawData = '';
     let parsedData;
 
@@ -176,15 +176,17 @@ export class UranusPlatformAccessory {
       this.platform.log.error(error.message);
     }).on('end', () => {
       parsedData = JSON.parse(rawData);
+      this.platform.log.info('Received data[end]: ', parsedData);
     });
 
+    this.platform.log.info('Received data[return]: ', parsedData);
     return parsedData;
   }
 
   async updateStates(): Promise<void> {
-    this.platform.log.debug('Requesting data...');
+    this.platform.log.info('Requesting data...');
     const data = this.getSensorData();
-    this.platform.log.debug('Received data: ', data);
+    this.platform.log.info('Received data: ', data);
     this.uranusStates.Battery = parseFloat(data.b) * 100;
     this.uranusStates.Humidity = data.h;
     this.uranusStates.Pressure = data.p;
