@@ -16,8 +16,8 @@
         "type": "number",
         "required": false,
         "default": 150,
-        "min": 60,
-        "max": 300
+        "minimum": 60,
+        "maximum": 300
       },
       "sensors": {
         "title": "Uranus Sensors list",
