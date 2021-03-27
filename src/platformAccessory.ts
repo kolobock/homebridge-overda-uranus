@@ -72,7 +72,7 @@ export class UranusPlatformAccessory {
       // push the new value to HomeKit
       this.updateStates.bind(this);
     }, this.updateInterval * 1000);
-    this.updateStates();
+    this.updateStates.bind(this);
   }
 
   /**
@@ -187,7 +187,7 @@ export class UranusPlatformAccessory {
     let data;
     try {
       this.platform.log.info('Requesting data...');
-      data = this.getSensorData.bind(this);
+      data = this.getSensorData();
       this.platform.log.info('Received data:', data);
     } catch (error) {
       this.platform.log.info('Got error:', error.message);
