@@ -158,10 +158,10 @@ export class UranusPlatformAccessory {
   }
 
   getSensorData() {
-    const overdaUrl = `https://overda-database.firebaseio.com/Devices/Uranus/
-      ${this.accessory.context.device.serialNumber}
-      -
-      ${this.accessory.context.device.pass}
+    const overdaUrl = `https://overda-database.firebaseio.com/Devices/Uranus/\
+      ${this.accessory.context.device.serialNumber}\
+      -\
+      ${this.accessory.context.device.pass}\
       /Values.json`;
     this.platform.log.info('overdaUrl: ', overdaUrl);
     let rawData = '';
@@ -184,9 +184,14 @@ export class UranusPlatformAccessory {
   }
 
   async updateStates(): Promise<void> {
-    this.platform.log.info('Requesting data...');
-    const data = this.getSensorData();
-    this.platform.log.info('Received data: ', data);
+    try {
+      this.platform.log.info('Requesting data...');
+      const data = this.getSensorData();
+      this.platform.log.info('Received data: ', data);
+    } catch (error) {
+      this.platform.log.info('Got error: ', error.message);
+      return;
+    }
     this.uranusStates.Battery = parseFloat(data.b) * 100;
     this.uranusStates.Humidity = data.h;
     this.uranusStates.Pressure = data.p;
