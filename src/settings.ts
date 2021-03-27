@@ -6,4 +6,4 @@ export const PLATFORM_NAME = 'OverdaUranus';
 /**
  * This must match the name of your plugin as defined the package.json
  */
-export const PLUGIN_NAME = 'homebridge-overda-uranuss';
+export const PLUGIN_NAME = 'homebridge-overda-uranus';
