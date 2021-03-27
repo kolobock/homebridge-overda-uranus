@@ -24,17 +24,17 @@
         "type": "array",
         "required": true,
         "items": {
-          "title": "Air Monitor Sensors",
+          "title": "Air Monitor Sensor",
           "type": "object",
           "properties": {
             "serialNumber": {
-              "title": "Uranus Serial Number",
+              "title": "Serial Number",
               "type": "string",
               "placeholder": "URN-000000",
               "required": true
             },
             "pass": {
-              "title": "Uranus Sensor PIN",
+              "title": "Sensor PIN",
               "type": "string",
               "placeholder": "0000",
               "min": 4,
@@ -42,7 +42,7 @@
               "required": true
             },
             "displayName": {
-              "title": "Uranus Sensor Name",
+              "title": "Display Name",
               "type": "string",
               "required": false,
               "default": "Uranus"
