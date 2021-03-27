@@ -51,9 +51,12 @@ export class UranusPlatformAccessory {
     this.service.getCharacteristic(this.platform.Characteristic.VOCDensity)
       .onGet(this.getVoc.bind(this));
 
-    const temperatureService = this.accessory.addService(this.platform.Service.TemperatureSensor, `Temperature ${this.displayName}`);
-    const humidityService = this.accessory.addService(this.platform.Service.HumiditySensor, `Humidity ${this.displayName}`);
-    const batteryService = this.accessory.addService(this.platform.Service.Battery, `Battery level ${this.displayName}`);
+    const temperatureService: Service = this.accessory.getService(this.platform.Service.TemperatureSensor) ||
+      this.accessory.addService(this.platform.Service.TemperatureSensor, `Temperature ${this.displayName}`);
+    const humidityService: Service = this.accessory.getService(this.platform.Service.HumiditySensor) ||
+      this.accessory.addService(this.platform.Service.HumiditySensor, `Humidity ${this.displayName}`);
+    const batteryService: Service = this.accessory.getService(this.platform.Service.Battery) ||
+      this.accessory.addService(this.platform.Service.Battery, `Battery level ${this.displayName}`);
     this.service.linkedServices = [temperatureService, humidityService, batteryService];
 
     temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
@@ -172,18 +175,17 @@ export class UranusPlatformAccessory {
       res.on('data', (data) => {
         rawData += data;
       });
-      res.on('error', (error) => {
-        this.platform.log.error(error.message);
-      });
-      res.on('end', () => {
-        parsedData = JSON.parse(rawData);
-      });
+    }).on('error', (error) => {
+      this.platform.log.error(error.message);
+    }).on('end', () => {
+      parsedData = JSON.parse(rawData);
     });
 
     return parsedData;
   }
 
   async updateStates(): Promise<void> {
+    this.platform.log.debug('Requesting data...');
     const data = this.getSensorData();
     this.platform.log.debug('Received data: ', data);
     this.uranusStates.Battery = parseFloat(data.b) * 100;
