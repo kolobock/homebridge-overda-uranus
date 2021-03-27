@@ -17,10 +17,6 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
   ) {
     this.log.debug('Finished initializing platform:', this.config.name);
 
-    // When this event is fired it means Homebridge has restored all cached accessories from disk.
-    // Dynamic Platform plugins should only register new accessories after this event was fired,
-    // in order to ensure they weren't added to homebridge already. This event can also be used
-    // to start discovery of new accessories.
     this.api.on('didFinishLaunching', () => {
       log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your sensors as accessories
@@ -33,23 +29,21 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
-    // this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-    // this.log.info('Removing existing accessory from cache:', accessory.displayName);
   }
 
   discoverSensors() {
     const uranusSensors = this.config.sensors;
 
-    // loop over the discovered devices and register each one if it has not already been registered
+    // loop over the discovered sensors and register each one if it has not already been registered
     for (const sensor of uranusSensors) {
 
       // generate a unique id for the accessory this should be generated from
-      // something globally unique, but constant, for example, the device serial
+      // something globally unique, but constant, for example, the sensor serial
       // number or MAC address
       const uuid = this.api.hap.uuid.generate(sensor.serialNumber);
 
       // see if an accessory with the same uuid has already been registered and restored from
-      // the cached devices we stored in the `configureAccessory` method above
+      // the cached sensors we stored in the `configureAccessory` method above
       const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
 
       if (existingAccessory) {
@@ -57,7 +51,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        existingAccessory.context.device = sensor;
+        existingAccessory.context.sensor = sensor;
         this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
@@ -75,9 +69,9 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
         // create a new accessory
         const accessory = new this.api.platformAccessory(sensor.displayName, uuid);
 
-        // store a copy of the device object in the `accessory.context`
+        // store a copy of the sensor object in the `accessory.context`
         // the `context` property can be used to store any data about the accessory you may need
-        accessory.context.device = sensor;
+        accessory.context.sensor = sensor;
 
         // create the accessory handler for the newly create accessory
         // this is imported from `platformAccessory.ts`

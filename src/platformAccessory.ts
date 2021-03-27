@@ -2,20 +2,15 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { UranusHomebridgePlatform } from './platform';
 import https from 'https';
 
-/**
- * Platform Accessory
- * An instance of this class is created for each accessory your platform registers
- * Each accessory may expose multiple services of different service types.
- */
 export class UranusPlatformAccessory {
   private service: Service;
 
   private uranusStates = {
-    Battery: 100,
-    Humidity: 40,
+    Battery: 0,
+    Humidity: 0,
     Pressure: 1000,
-    Voc: 25,
-    Temperature: 20,
+    Voc: 0,
+    Temperature: 0,
   };
 
   private category = this.platform.api.hap.Categories.SENSOR;
@@ -27,7 +22,7 @@ export class UranusPlatformAccessory {
     private readonly accessory: PlatformAccessory,
   ) {
 
-    this.displayName = accessory.context.device.displayName;
+    this.displayName = accessory.context.sensor.displayName;
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
     this.platform.log.info('Update Interval:', this.updateInterval, 's');
 
@@ -36,7 +31,7 @@ export class UranusPlatformAccessory {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Overda')
       .setCharacteristic(this.platform.Characteristic.Model, 'Uranus')
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, 'v1')
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.serialNumber);
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.sensor.serialNumber);
 
     this.service = this.accessory.getService(this.platform.Service.AirQualitySensor) ||
       this.accessory.addService(this.platform.Service.AirQualitySensor, `IAQ ${this.displayName}`);
@@ -75,19 +70,6 @@ export class UranusPlatformAccessory {
     this.updateStates();
   }
 
-  /**
-   * Handle the "GET" requests from HomeKit
-   * These are sent when HomeKit wants to know the current state of the accessory, for example, checking if a Light bulb is on.
-   *
-   * GET requests should return as fast as possbile. A long delay here will result in
-   * HomeKit being unresponsive and a bad user experience in general.
-   *
-   * If your device takes time to respond you should update the status of your device
-   * asynchronously instead using the `updateCharacteristic` method instead.
-
-   * @example
-   * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
-   */
   async getIAQ(): Promise<CharacteristicValue> {
     const voc = this.uranusStates.Voc;
     let IAQ;
@@ -159,38 +141,38 @@ export class UranusPlatformAccessory {
 
   getSensorData() {
     const overdaUrl = 'https://overda-database.firebaseio.com/Devices/Uranus/' +
-                      this.accessory.context.device.serialNumber +
+                      this.accessory.context.sensor.serialNumber +
                       '-' +
-                      this.accessory.context.device.pass +
+                      this.accessory.context.sensor.pass +
                       '/Values.json';
-    this.platform.log.info('overdaUrl:', overdaUrl);
+    this.platform.log.debug('overdaUrl:', overdaUrl);
+
     let rawData = '';
-    let parsedData;
 
-    https.get(overdaUrl, (res) => {
-      res.setEncoding('utf8');
-      res.on('data', (data) => {
-        rawData += data;
+    return new Promise((resolve, reject) => {
+      https.get(overdaUrl, (res) => {
+        res.setEncoding('utf8');
+        res.on('data', (data) => {
+          rawData += data;
+        });
+        res.on('end', () => {
+          const parsedData = JSON.parse(rawData);
+          resolve(parsedData);
+        });
+      }).on('error', (error) => {
+        this.platform.log.error(error.message);
+        reject(error);
       });
-    }).on('error', (error) => {
-      this.platform.log.error(error.message);
-    }).on('end', () => {
-      parsedData = JSON.parse(rawData);
-      this.platform.log.info('Received data[end]:', parsedData);
     });
-
-    this.platform.log.info('Received data[return]:', parsedData);
-    return parsedData;
   }
 
   async updateStates(): Promise<void> {
     let data;
     try {
-      this.platform.log.info('Requesting data...');
-      data = this.getSensorData();
-      this.platform.log.info('Received data:', data);
+      data = await this.getSensorData();
+      this.platform.log.debug('Received data:', data);
     } catch (error) {
-      this.platform.log.info('Got error:', error.message);
+      this.platform.log.warn('Got error retrieving data:', error.message);
       return;
     }
 

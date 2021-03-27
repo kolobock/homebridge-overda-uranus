@@ -12,11 +12,10 @@ This is a Homebridge platform plugin for [Overda Uranus](https://overda.one) sen
 
 ## Installation
 ```
-sudo npm install -g homebridge-overda-uranus@beta
+sudo npm install -g homebridge-overda-uranus
 ```
 
 ## Configuration
-
     {
       "platform": "OverdaUranus",
       "name": "Uranus",
