@@ -38,11 +38,8 @@ export class UranusPlatformAccessory {
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, 'v1')
       .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.serialNumber);
 
-    // set the service name, this is what is displayed as the default name on the Home app
-    // in this example we are using the name we stored in the `accessory.context` in the `discoverSensors` method.
     this.service = this.accessory.getService(this.platform.Service.AirQualitySensor) ||
       this.accessory.addService(this.platform.Service.AirQualitySensor, `IAQ ${this.displayName}`);
-    // this.service.setCharacteristic(this.platform.Characteristic.Name, `IAQ ${this.displayName}`);
 
     this.service.getCharacteristic(this.platform.Characteristic.AirQuality)
       .onGet(this.getIAQ.bind(this));
@@ -226,4 +223,7 @@ export class UranusPlatformAccessory {
   //   this.platform.log.debug('Set Characteristic Temperature -> ', value);
   // }
   //
+  getServices() {
+    return [this.service];
+  }
 }
