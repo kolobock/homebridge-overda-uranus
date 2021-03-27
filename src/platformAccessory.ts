@@ -29,7 +29,7 @@ export class UranusPlatformAccessory {
 
     this.displayName = accessory.context.device.displayName;
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
-    this.platform.log.debug('Update Interval: ', this.updateInterval, 's');
+    this.platform.log.debug('Update Interval:', this.updateInterval, 's');
 
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
@@ -163,7 +163,7 @@ export class UranusPlatformAccessory {
                       '-' +
                       this.accessory.context.device.pass +
                       '/Values.json';
-    this.platform.log.info('overdaUrl: ', overdaUrl);
+    this.platform.log.info('overdaUrl:', overdaUrl);
     let rawData = '';
     let parsedData;
 
@@ -176,10 +176,10 @@ export class UranusPlatformAccessory {
       this.platform.log.error(error.message);
     }).on('end', () => {
       parsedData = JSON.parse(rawData);
-      this.platform.log.info('Received data[end]: ', parsedData);
+      this.platform.log.info('Received data[end]:', parsedData);
     });
 
-    this.platform.log.info('Received data[return]: ', parsedData);
+    this.platform.log.info('Received data[return]:', parsedData);
     return parsedData;
   }
 
@@ -187,51 +187,21 @@ export class UranusPlatformAccessory {
     let data;
     try {
       this.platform.log.info('Requesting data...');
-      data = this.getSensorData();
-      this.platform.log.info('Received data: ', data);
+      data = await this.getSensorData();
+      this.platform.log.info('Received data:', data);
     } catch (error) {
-      this.platform.log.info('Got error: ', error.message);
+      this.platform.log.info('Got error:', error.message);
       return;
     }
+
+    if (!data) {
+      return;
+    }
+
     this.uranusStates.Battery = parseFloat(data.b) * 100;
     this.uranusStates.Humidity = data.h;
     this.uranusStates.Pressure = data.p;
     this.uranusStates.Temperature = data.t;
     this.uranusStates.Voc = data.v;
-  }
-
-  /**
-   * Handle "SET" requests from HomeKit
-   */
-
-  // async setBattery(value: CharacteristicValue) {
-  //   // implement your own code to set the brightness
-  //   this.uranusStates.Battery = value as number;
-  //
-  //   this.platform.log.debug('Set Characteristic Battery -> ', value);
-  // }
-  // async setHumidity(value: CharacteristicValue) {
-  //   this.uranusStates.Humidity = value as number;
-  //
-  //   this.platform.log.debug('Set Characteristic Humidity -> ', value);
-  // }
-  // async setPressure(value: CharacteristicValue) {
-  //   this.uranusStates.Pressure = value as number;
-  //
-  //   this.platform.log.debug('Set Characteristic Pressure -> ', value);
-  // }
-  // async setVoc(value: CharacteristicValue) {
-  //   this.uranusStates.Voc = value as number;
-  //
-  //   this.platform.log.debug('Set Characteristic Voc -> ', value);
-  // }
-  // async setTemperature(value: CharacteristicValue) {
-  //   this.uranusStates.Temperature = value as number;
-  //
-  //   this.platform.log.debug('Set Characteristic Temperature -> ', value);
-  // }
-  //
-  getServices() {
-    return [this.service];
   }
 }
