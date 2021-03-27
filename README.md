@@ -17,13 +17,15 @@ sudo npm install -g homebridge-overda-uranus@beta
 
 ## Configuration
 
-    "platform": "OverdaUranusHomebridgePlugin",
-    "name": "Uranus",
-    "updateInterval": 75, // Default 150, range 60..300
-    "sensors": [
-      {
-        "displayName": "Uranus Leaving Room",
-        "serialNumber": "URN-000000",
-        "pass": "0000"
-      }
-    ]
+    {
+      "platform": "OverdaUranus",
+      "name": "Uranus",
+      "updateInterval": 75, // Default 150, range 60..300
+      "sensors": [
+        {
+          "displayName": "Uranus Leaving Room",
+          "serialNumber": "URN-000000",
+          "pass": "0000"
+        }
+      ]
+    }
