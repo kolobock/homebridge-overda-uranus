@@ -187,7 +187,7 @@ export class UranusPlatformAccessory {
     let data;
     try {
       this.platform.log.info('Requesting data...');
-      data = await this.getSensorData.bind(this);
+      data = this.getSensorData.bind(this);
       this.platform.log.info('Received data:', data);
     } catch (error) {
       this.platform.log.info('Got error:', error.message);
