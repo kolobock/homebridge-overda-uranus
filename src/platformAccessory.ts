@@ -157,7 +157,7 @@ export class UranusPlatformAccessory {
     return humidity;
   }
 
-  async getSensorData(): Promise<string> {
+  getSensorData() {
     const overdaUrl = 'https://overda-database.firebaseio.com/Devices/Uranus/' +
                       this.accessory.context.device.serialNumber +
                       '-' +
