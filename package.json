@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Homebridge Overda Uranus",
   "name": "homebridge-overda-uranuss",
-  "version": "1.0.6-beta.4",
+  "version": "1.0.6-beta.5",
   "description": "Exposes sensors data from Uranus air-monitor station.",
   "license": "Apache-2.0",
   "repository": {
