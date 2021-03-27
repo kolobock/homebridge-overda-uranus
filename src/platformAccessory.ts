@@ -184,9 +184,10 @@ export class UranusPlatformAccessory {
   }
 
   async updateStates(): Promise<void> {
+    let data;
     try {
       this.platform.log.info('Requesting data...');
-      const data = this.getSensorData();
+      data = this.getSensorData();
       this.platform.log.info('Received data: ', data);
     } catch (error) {
       this.platform.log.info('Got error: ', error.message);
