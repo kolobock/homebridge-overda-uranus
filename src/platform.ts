@@ -33,6 +33,8 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
+    // this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+    // this.log.info('Removing existing accessory from cache:', accessory.displayName);
   }
 
   discoverSensors() {
@@ -60,7 +62,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        // new UranusPlatformAccessory(this, existingAccessory);
+        new UranusPlatformAccessory(this, existingAccessory);
 
         // it is possible to remove platform accessories at any time using `api.unregisterPlatformAccessories`, eg.:
         // remove platform accessories when no longer present
