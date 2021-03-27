@@ -29,6 +29,7 @@ export class UranusPlatformAccessory {
 
     this.displayName = accessory.context.device.displayName;
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
+    this.platform.log.debug('Update Interval: ', this.updateInterval, 's');
 
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
@@ -70,7 +71,8 @@ export class UranusPlatformAccessory {
     setInterval(() => {
       // push the new value to HomeKit
       this.updateStates.bind(this);
-    }, this.updateInterval);
+    }, this.updateInterval * 1000);
+    this.updateStates();
   }
 
   /**
@@ -161,6 +163,7 @@ export class UranusPlatformAccessory {
       -
       ${this.accessory.context.device.pass}
       /Values.json`;
+    this.platform.log.debug('overdaUrl: ', overdaUrl);
     let rawData = '';
     let parsedData;
 
@@ -182,6 +185,7 @@ export class UranusPlatformAccessory {
 
   async updateStates(): Promise<void> {
     const data = this.getSensorData();
+    this.platform.log.debug('Received data: ', data);
     this.uranusStates.Battery = parseFloat(data.b) * 100;
     this.uranusStates.Humidity = data.h;
     this.uranusStates.Pressure = data.p;
