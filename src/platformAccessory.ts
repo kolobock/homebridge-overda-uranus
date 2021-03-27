@@ -29,7 +29,7 @@ export class UranusPlatformAccessory {
 
     this.displayName = accessory.context.device.displayName;
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
-    this.platform.log.debug('Update Interval:', this.updateInterval, 's');
+    this.platform.log.info('Update Interval:', this.updateInterval, 's');
 
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
@@ -70,9 +70,9 @@ export class UranusPlatformAccessory {
      */
     setInterval(() => {
       // push the new value to HomeKit
-      this.updateStates.bind(this);
+      this.updateStates();
     }, this.updateInterval * 1000);
-    this.updateStates.bind(this);
+    this.updateStates();
   }
 
   /**
