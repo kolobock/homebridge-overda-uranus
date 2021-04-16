@@ -3,9 +3,11 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { UranusPlatformAccessory } from './platformAccessory';
 
+import { AirPressureLevel } from './customCharacteristic';
+
 export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
+  public Characteristic: typeof Characteristic & AirPressureLevel;
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
@@ -22,6 +24,9 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
       // run the method to discover / register your sensors as accessories
       this.discoverSensors();
     });
+    this.Characteristic = Object.defineProperty(this.api.hap.Characteristic, 'AirPressureLevel', {value: AirPressureLevel});
+    // FIXME: need to properly define PropertyDescriptor for AirPressureLevel
+    Object.defineProperties(this.api.hap.Characteristic, { 'AirPressureLevel': {value: AirPressureLevel} });
   }
 
   configureAccessory(accessory: PlatformAccessory) {

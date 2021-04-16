@@ -2,18 +2,29 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { UranusHomebridgePlatform } from './platform';
 import https from 'https';
 
+declare interface UranusDataFormat {
+  b: number; // battery level: 0.1-1
+  h: number; // humidity: 0-100%
+  p: number; // atmospheric air pressure: 800-1200 kPa
+  t: number; // temperature: -273-100 oC
+  v: number; // VOC density: 0-500
+}
+
 export class UranusPlatformAccessory {
   private service: Service;
+  private temperatureService: Service;
+  private humidityService: Service;
+  private batteryService: Service;
 
   private uranusStates = {
     Battery: 0,
     Humidity: 0,
-    Pressure: 1000,
+    Pressure: 800,
     Voc: 0,
     Temperature: 0,
   };
 
-  private category = this.platform.api.hap.Categories.SENSOR;
+  private category: number = this.platform.api.hap.Categories.SENSOR;
   private displayName: string;
   private updateInterval: number;
 
@@ -21,7 +32,6 @@ export class UranusPlatformAccessory {
     private readonly platform: UranusHomebridgePlatform,
     private readonly accessory: PlatformAccessory,
   ) {
-
     this.displayName = accessory.context.sensor.displayName;
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
     this.platform.log.info('Update Interval:', this.updateInterval, 's');
@@ -43,21 +53,24 @@ export class UranusPlatformAccessory {
     this.service.getCharacteristic(this.platform.Characteristic.VOCDensity)
       .onGet(this.getVoc.bind(this));
 
-    const temperatureService: Service = this.accessory.getService(this.platform.Service.TemperatureSensor) ||
+    this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor) ||
       this.accessory.addService(this.platform.Service.TemperatureSensor, `Temperature ${this.displayName}`);
-    const humidityService: Service = this.accessory.getService(this.platform.Service.HumiditySensor) ||
+    this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor) ||
       this.accessory.addService(this.platform.Service.HumiditySensor, `Humidity ${this.displayName}`);
-    const batteryService: Service = this.accessory.getService(this.platform.Service.Battery) ||
+    this.batteryService = this.accessory.getService(this.platform.Service.Battery) ||
       this.accessory.addService(this.platform.Service.Battery, `Battery level ${this.displayName}`);
-    this.service.linkedServices = [temperatureService, humidityService, batteryService];
+    (this.temperatureService.getCharacteristic(this.platform.Characteristic.AirPressureLevel) ||
+     this.temperatureService.addOptionalCharacteristic(this.platform.Characteristic.AirPressureLevel))
+      .onGet(this.getAirPressure.bind(this));
+    this.service.linkedServices = [this.temperatureService, this.humidityService, this.batteryService];
 
-    temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+    this.temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
       .onGet(this.getTemperature.bind(this));
-    humidityService.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+    this.humidityService.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
       .onGet(this.getHumidity.bind(this));
-    batteryService.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
+    this.batteryService.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
       .onGet(this.getBattery.bind(this));
-    batteryService.getCharacteristic(this.platform.Characteristic.BatteryLevel)
+    this.batteryService.getCharacteristic(this.platform.Characteristic.BatteryLevel)
       .onGet(this.getBatteryLevel.bind(this));
 
     /**
@@ -71,8 +84,8 @@ export class UranusPlatformAccessory {
   }
 
   async getIAQ(): Promise<CharacteristicValue> {
-    const voc = this.uranusStates.Voc;
-    let IAQ;
+    const voc: number = this.uranusStates.Voc;
+    let IAQ: number;
 
     if (voc <= 50) {
       IAQ = this.platform.Characteristic.AirQuality.EXCELLENT;
@@ -94,7 +107,7 @@ export class UranusPlatformAccessory {
   }
 
   async getBattery(): Promise<CharacteristicValue> {
-    let batteryLevel;
+    let batteryLevel: number;
 
     if (this.uranusStates.Battery < 20) {
       batteryLevel = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
@@ -108,7 +121,7 @@ export class UranusPlatformAccessory {
   }
 
   async getBatteryLevel(): Promise<CharacteristicValue> {
-    const batteryLevel = this.uranusStates.Battery;
+    const batteryLevel: number = this.uranusStates.Battery;
 
     this.platform.log.debug('Get Characteristic BatteryLevel ->', batteryLevel);
 
@@ -116,7 +129,7 @@ export class UranusPlatformAccessory {
   }
 
   async getTemperature(): Promise<CharacteristicValue> {
-    const temperature = this.uranusStates.Temperature;
+    const temperature: number = this.uranusStates.Temperature;
 
     this.platform.log.debug('Get Characteristic Temperature ->', temperature);
 
@@ -124,23 +137,31 @@ export class UranusPlatformAccessory {
   }
 
   async getVoc(): Promise<CharacteristicValue> {
-    const voc = this.uranusStates.Voc;
+    const voc: number = this.uranusStates.Voc;
 
-    this.platform.log.debug('Get Characteristic Voc ->', voc);
+    this.platform.log.debug('Get Characteristic VocDensity ->', voc);
 
     return voc;
   }
 
+  async getAirPressure(): Promise<CharacteristicValue> {
+    const pressure: number = this.uranusStates.Pressure;
+
+    this.platform.log.debug('Get Characteristic Pressure ->', pressure);
+
+    return pressure;
+  }
+
   async getHumidity(): Promise<CharacteristicValue> {
-    const humidity = this.uranusStates.Humidity;
+    const humidity: number = this.uranusStates.Humidity;
 
     this.platform.log.debug('Get Characteristic Humidity ->', humidity);
 
     return humidity;
   }
 
-  getSensorData() {
-    const overdaUrl = 'https://overda-database.firebaseio.com/Devices/Uranus/' +
+  getSensorData(): Promise<UranusDataFormat> {
+    const overdaUrl: string = 'https://overda-database.firebaseio.com/Devices/Uranus/' +
                       this.accessory.context.sensor.serialNumber +
                       '-' +
                       this.accessory.context.sensor.pass +
@@ -156,7 +177,7 @@ export class UranusPlatformAccessory {
           rawData += data;
         });
         res.on('end', () => {
-          const parsedData = JSON.parse(rawData);
+          const parsedData: UranusDataFormat = JSON.parse(rawData);
           resolve(parsedData);
         });
       }).on('error', (error) => {
@@ -167,7 +188,7 @@ export class UranusPlatformAccessory {
   }
 
   async updateStates(): Promise<void> {
-    let data;
+    let data: UranusDataFormat;
     try {
       data = await this.getSensorData();
       this.platform.log.debug('Received data:', data);
@@ -180,10 +201,33 @@ export class UranusPlatformAccessory {
       return;
     }
 
-    this.uranusStates.Battery = parseFloat(data.b) * 100;
+    this.uranusStates.Battery = data.b * 100;
     this.uranusStates.Humidity = data.h;
     this.uranusStates.Pressure = data.p;
     this.uranusStates.Temperature = data.t;
     this.uranusStates.Voc = data.v;
+
+    this.platform.log.debug('Updating Characteristic Pressure ->', data.p);
+    this.temperatureService.updateCharacteristic(this.platform.Characteristic.AirPressureLevel, await this.getAirPressure());
+
+    this.platform.log.debug('Updating Characteristic Battery Level ->', data.b);
+    this.batteryService.updateCharacteristic(this.platform.Characteristic.BatteryLevel, await this.getBatteryLevel());
+
+    this.platform.log.debug('Updating Characteristic Humidity ->', data.h);
+    this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, await this.getHumidity());
+
+    this.platform.log.debug('Updating Characteristic Temperature ->', data.t);
+    this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, await this.getTemperature());
+
+    this.platform.log.debug('Updating Characteristic VOC ->', data.v);
+    this.service.updateCharacteristic(this.platform.Characteristic.VOCDensity, await this.getVoc());
+
+    const IAQ: CharacteristicValue = await this.getIAQ();
+    this.platform.log.debug('Updating Characteristic IAQ ->', IAQ);
+    this.service.updateCharacteristic(this.platform.Characteristic.AirQuality, IAQ);
+
+    const LowBatt: CharacteristicValue = await this.getBattery();
+    this.platform.log.debug('Updating Characteristic StatusLowBattery ->', LowBatt);
+    this.batteryService.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, LowBatt);
   }
 }
