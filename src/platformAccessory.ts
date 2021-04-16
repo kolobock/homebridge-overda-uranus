@@ -3,11 +3,11 @@ import { UranusHomebridgePlatform } from './platform';
 import https from 'https';
 
 declare interface UranusDataFormat {
-  b: number, // battery level: 0.1-1
-  h: number, // humidity: 0-100%
-  p: number, // atmospheric air pressure: 800-1200 kPa
-  t: number, // temperature: -273-100 oC
-  v: number, // VOC density: 0-500
+  b: number; // battery level: 0.1-1
+  h: number; // humidity: 0-100%
+  p: number; // atmospheric air pressure: 800-1200 kPa
+  t: number; // temperature: -273-100 oC
+  v: number; // VOC density: 0-500
 }
 
 export class UranusPlatformAccessory {
@@ -168,7 +168,7 @@ export class UranusPlatformAccessory {
                       '/Values.json';
     this.platform.log.debug('overdaUrl:', overdaUrl);
 
-    let rawData: string = '';
+    let rawData = '';
 
     return new Promise((resolve, reject) => {
       https.get(overdaUrl, (res) => {

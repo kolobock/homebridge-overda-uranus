@@ -7,7 +7,7 @@ import { AirPressureLevel } from './customCharacteristic';
 
 export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
-  public Characteristic: any;
+  public Characteristic: typeof Characteristic & AirPressureLevel;
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
@@ -26,7 +26,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
     });
     this.Characteristic = Object.defineProperty(this.api.hap.Characteristic, 'AirPressureLevel', {value: AirPressureLevel});
     // FIXME: need to properly define PropertyDescriptor for AirPressureLevel
-    Object.defineProperties(this.api.hap.Characteristic,  { 'AirPressureLevel': {value: AirPressureLevel} });
+    Object.defineProperties(this.api.hap.Characteristic, { 'AirPressureLevel': {value: AirPressureLevel} });
   }
 
   configureAccessory(accessory: PlatformAccessory) {
