@@ -29,7 +29,7 @@ export class UranusPlatformAccessory {
   private updateInterval: number;
 
   constructor(
-    public readonly platform: UranusHomebridgePlatform,
+    private readonly platform: UranusHomebridgePlatform,
     private readonly accessory: PlatformAccessory,
   ) {
     this.displayName = accessory.context.sensor.displayName;
