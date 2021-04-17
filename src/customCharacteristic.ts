@@ -1,9 +1,9 @@
 import { Formats, Perms } from 'homebridge';
 
 export = (homebridge) => {
-  const Characteristic = homebridge.hap.Characteristic;
+  const Charact = homebridge.hap.Characteristic;
 
-  return class AirPressureLevel extends Characteristic {
+  return class AirPressureLevel extends Charact {
     public static readonly UUID: string = '0000007C-0000-1000-8000-0026BB765291';
 
     constructor() {

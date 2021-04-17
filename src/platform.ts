@@ -5,14 +5,12 @@ import { UranusPlatformAccessory } from './platformAccessory';
 
 import AirPressure = require('./customCharacteristic');
 
-export declare interface AirPressureLevel {
-  AirPressureLevel;
-}
+let IAirPressureLevel;
 
 export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
-  private AirPressureLevel: any;
+  private AirPressureLevel;
   public readonly Service: typeof Service = this.api.hap.Service;
-  public Characteristic: typeof Characteristic & AirPressureLevel;
+  public Characteristic: typeof Characteristic & typeof IAirPressureLevel;
 
   public readonly accessories: PlatformAccessory[] = [];
 
@@ -24,6 +22,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
     this.log.debug('Finished initializing platform:', this.config.name);
 
     this.AirPressureLevel = AirPressure(this.api);
+    IAirPressureLevel = this.AirPressureLevel;
 
     this.api.on('didFinishLaunching', () => {
       log.debug('Executed didFinishLaunching callback');
@@ -31,7 +30,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
     });
     this.Characteristic = Object.defineProperty(this.api.hap.Characteristic, 'AirPressureLevel', {value: this.AirPressureLevel});
     // FIXME: need to properly define PropertyDescriptor for AirPressureLevel
-    Object.defineProperties(this.Characteristic, { 'AirPressureLevel': this.AirPressureLevel });
+    Object.defineProperties(this.Characteristic, { 'AirPressureLevel': {value: this.AirPressureLevel} });
   }
 
   configureAccessory(accessory: PlatformAccessory) {
