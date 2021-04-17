@@ -1,6 +1,6 @@
 # Change Log
 
-## v2.0.1 (2021-04-17)
+## v2.1.0 (2021-04-17)
 
 ### Fixes
 #### Do not import from `hap-nodejs`, use `homebridge` instead
