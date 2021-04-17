@@ -36,7 +36,6 @@ export class UranusPlatformAccessory {
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
     this.platform.log.info('Update Interval:', this.updateInterval, 's');
 
-    // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Overda')
       .setCharacteristic(this.platform.Characteristic.Model, 'Uranus')
@@ -73,11 +72,7 @@ export class UranusPlatformAccessory {
     this.batteryService.getCharacteristic(this.platform.Characteristic.BatteryLevel)
       .onGet(this.getBatteryLevel.bind(this));
 
-    /**
-     * Updating characteristics values asynchronously.
-     */
     setInterval(() => {
-      // push the new value to HomeKit
       this.updateStates();
     }, this.updateInterval * 1000);
     this.updateStates();
@@ -162,10 +157,10 @@ export class UranusPlatformAccessory {
 
   getSensorData(): Promise<UranusDataFormat> {
     const overdaUrl: string = 'https://overda-database.firebaseio.com/Devices/Uranus/' +
-                      this.accessory.context.sensor.serialNumber +
-                      '-' +
-                      this.accessory.context.sensor.pass +
-                      '/Values.json';
+                              this.accessory.context.sensor.serialNumber +
+                              '-' +
+                              this.accessory.context.sensor.pass +
+                              '/Values.json';
     this.platform.log.debug('overdaUrl:', overdaUrl);
 
     let rawData = '';

@@ -1,5 +1,13 @@
 # Change Log
 
+## v2.0.1 (2021-04-17)
+
+### Fixes
+#### Do not import from `hap-nodejs`, use `homebridge` instead
+
+### Code Cleanup
+#### Removed extra comments
+
 ## v2.0.0 (2021-04-17)
 
 ### Add AirPressureLevel custom Characteristic
