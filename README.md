@@ -9,6 +9,7 @@
 # Overda Uranus Homebridge Platform Plugin
 
 This is a Homebridge platform plugin for [Overda Uranus](https://overda.one) sensors.
+Exposes sensors data from Uranus air-monitor station.
 
 ## Installation
 ```
@@ -28,3 +29,6 @@ sudo npm install -g homebridge-overda-uranus
         }
       ]
     }
+
+### Uranus DB json response example
+    {"b":0.98,"h":47,"p":1012,"t":23.53,"v":92}
