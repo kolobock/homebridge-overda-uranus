@@ -32,9 +32,9 @@ export class UranusPlatformAccessory {
     private readonly platform: UranusHomebridgePlatform,
     private readonly accessory: PlatformAccessory,
   ) {
-    this.displayName = accessory.context.sensor.displayName;
+    this.displayName = accessory.context.sensor.displayName || accessory.context.sensor.serialNumber;
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
-    this.platform.log.info('Update Interval:', this.updateInterval, 's');
+    this.platform.log.info(`[${this.displayName}] Update Interval:`, this.updateInterval, 's');
 
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Overda')
@@ -96,7 +96,7 @@ export class UranusPlatformAccessory {
       IAQ = this.platform.Characteristic.AirQuality.UNKNOWN;
     }
 
-    this.platform.log.debug('Get Characteristic AirQuality ->', IAQ);
+    this.platform.log.debug(`[${this.displayName}] Get Characteristic AirQuality ->`, IAQ);
 
     return IAQ;
   }
@@ -110,7 +110,7 @@ export class UranusPlatformAccessory {
       batteryLevel = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
 
-    this.platform.log.debug('Get Characteristic StatusLowBattery ->', batteryLevel);
+    this.platform.log.debug(`[${this.displayName}] Get Characteristic StatusLowBattery ->`, batteryLevel);
 
     return batteryLevel;
   }
@@ -118,7 +118,7 @@ export class UranusPlatformAccessory {
   async getBatteryLevel(): Promise<CharacteristicValue> {
     const batteryLevel: number = this.uranusStates.Battery;
 
-    this.platform.log.debug('Get Characteristic BatteryLevel ->', batteryLevel);
+    this.platform.log.debug(`[${this.displayName}] Get Characteristic BatteryLevel ->`, batteryLevel);
 
     return batteryLevel;
   }
@@ -126,7 +126,7 @@ export class UranusPlatformAccessory {
   async getTemperature(): Promise<CharacteristicValue> {
     const temperature: number = this.uranusStates.Temperature;
 
-    this.platform.log.debug('Get Characteristic Temperature ->', temperature);
+    this.platform.log.debug(`[${this.displayName}] Get Characteristic Temperature ->`, temperature);
 
     return temperature;
   }
@@ -134,7 +134,7 @@ export class UranusPlatformAccessory {
   async getVoc(): Promise<CharacteristicValue> {
     const voc: number = this.uranusStates.Voc;
 
-    this.platform.log.debug('Get Characteristic VocDensity ->', voc);
+    this.platform.log.debug(`[${this.displayName}] Get Characteristic VocDensity ->`, voc);
 
     return voc;
   }
@@ -142,7 +142,7 @@ export class UranusPlatformAccessory {
   async getAirPressure(): Promise<CharacteristicValue> {
     const pressure: number = this.uranusStates.Pressure;
 
-    this.platform.log.debug('Get Characteristic Pressure ->', pressure);
+    this.platform.log.debug(`[${this.displayName}] Get Characteristic Pressure ->`, pressure);
 
     return pressure;
   }
@@ -150,7 +150,7 @@ export class UranusPlatformAccessory {
   async getHumidity(): Promise<CharacteristicValue> {
     const humidity: number = this.uranusStates.Humidity;
 
-    this.platform.log.debug('Get Characteristic Humidity ->', humidity);
+    this.platform.log.debug(`[${this.displayName}] Get Characteristic Humidity ->`, humidity);
 
     return humidity;
   }
@@ -161,7 +161,7 @@ export class UranusPlatformAccessory {
                               '-' +
                               this.accessory.context.sensor.pass +
                               '/Values.json';
-    this.platform.log.debug('overdaUrl:', overdaUrl);
+    this.platform.log.debug(`[${this.displayName}] overdaUrl:`, overdaUrl);
 
     let rawData = '';
 
@@ -176,7 +176,7 @@ export class UranusPlatformAccessory {
           resolve(parsedData);
         });
       }).on('error', (error) => {
-        this.platform.log.error(error.message);
+        this.platform.log.error(`[${this.displayName}] ${error.message}`);
         reject(error);
       });
     });
@@ -186,9 +186,9 @@ export class UranusPlatformAccessory {
     let data: UranusDataFormat;
     try {
       data = await this.getSensorData();
-      this.platform.log.debug('Received data:', data);
+      this.platform.log.debug(`[${this.displayName}] Received data:`, data);
     } catch (error) {
-      this.platform.log.warn('Got error retrieving data:', error.message);
+      this.platform.log.warn(`[${this.displayName}] Got error retrieving data:`, error.message);
       return;
     }
 
@@ -202,27 +202,27 @@ export class UranusPlatformAccessory {
     this.uranusStates.Temperature = data.t;
     this.uranusStates.Voc = data.v;
 
-    this.platform.log.debug('Updating Characteristic Pressure ->', data.p);
+    this.platform.log.debug(`[${this.displayName}] Updating Characteristic Pressure ->`, data.p);
     this.temperatureService.updateCharacteristic(this.platform.Characteristic.AirPressureLevel, await this.getAirPressure());
 
-    this.platform.log.debug('Updating Characteristic Battery Level ->', data.b);
+    this.platform.log.debug(`[${this.displayName}] Updating Characteristic Battery Level ->`, data.b);
     this.batteryService.updateCharacteristic(this.platform.Characteristic.BatteryLevel, await this.getBatteryLevel());
 
-    this.platform.log.debug('Updating Characteristic Humidity ->', data.h);
+    this.platform.log.debug(`[${this.displayName}] Updating Characteristic Humidity ->`, data.h);
     this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, await this.getHumidity());
 
-    this.platform.log.debug('Updating Characteristic Temperature ->', data.t);
+    this.platform.log.debug(`[${this.displayName}] Updating Characteristic Temperature ->`, data.t);
     this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, await this.getTemperature());
 
-    this.platform.log.debug('Updating Characteristic VOC ->', data.v);
+    this.platform.log.debug(`[${this.displayName}] Updating Characteristic VOC ->`, data.v);
     this.service.updateCharacteristic(this.platform.Characteristic.VOCDensity, await this.getVoc());
 
     const IAQ: CharacteristicValue = await this.getIAQ();
-    this.platform.log.debug('Updating Characteristic IAQ ->', IAQ);
+    this.platform.log.debug(`[${this.displayName}] Updating Characteristic IAQ ->`, IAQ);
     this.service.updateCharacteristic(this.platform.Characteristic.AirQuality, IAQ);
 
     const LowBatt: CharacteristicValue = await this.getBattery();
-    this.platform.log.debug('Updating Characteristic StatusLowBattery ->', LowBatt);
+    this.platform.log.debug(`[${this.displayName}] Updating Characteristic StatusLowBattery ->`, LowBatt);
     this.batteryService.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, LowBatt);
   }
 }
