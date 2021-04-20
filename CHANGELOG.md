@@ -1,5 +1,10 @@
 # Change Log
 
+## v2.1.2 (2021-04-20)
+
+### Code improvements
+#### Update Readme with pictures
+
 ## v2.1.1 (2021-04-20)
 
 ### Code improvements
