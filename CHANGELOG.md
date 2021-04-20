@@ -1,5 +1,10 @@
 # Change Log
 
+## v2.1.1 (2021-04-20)
+
+### Code improvements
+#### Add sensor name to log messages
+
 ## v2.1.0 (2021-04-17)
 
 ### Fixes
