@@ -1,5 +1,11 @@
 # Change Log
 
+## v2.1.3 (2021-04-21)
+
+### Code improvements
+#### Show measured data in log on fetching remote data
+#### Update accessory name if it has changed in config
+
 ## v2.1.2 (2021-04-20)
 
 ### Code improvements
