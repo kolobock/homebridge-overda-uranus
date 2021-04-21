@@ -5,9 +5,9 @@ import https from 'https';
 declare interface UranusDataFormat {
   b: number; // battery level: 0.1-1
   h: number; // humidity: 0-100%
-  p: number; // atmospheric air pressure: 800-1200 kPa
-  t: number; // temperature: -273-100 oC
-  v: number; // VOC density: 0-500
+  p: number; // atmospheric air pressure: 800-1200 hPa
+  t: number; // temperature: -273-100 °C
+  v: number; // VOC density: 0-500 µg/m³
 }
 
 export class UranusPlatformAccessory {
@@ -32,7 +32,7 @@ export class UranusPlatformAccessory {
     private readonly platform: UranusHomebridgePlatform,
     private readonly accessory: PlatformAccessory,
   ) {
-    this.displayName = accessory.context.sensor.displayName || accessory.context.sensor.serialNumber;
+    this.displayName = accessory.context.sensor.displayName;
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
     this.platform.log.info(`[${this.displayName}] Update Interval:`, this.updateInterval, 's');
 
@@ -197,10 +197,15 @@ export class UranusPlatformAccessory {
     }
 
     this.uranusStates.Battery = data.b * 100;
+    this.platform.log.info(`[${this.displayName}] Measured Battery Level ->`, this.uranusStates.Battery, '%');
     this.uranusStates.Humidity = data.h;
+    this.platform.log.info(`[${this.displayName}] Measured Humidity ->`, this.uranusStates.Humidity, '%');
     this.uranusStates.Pressure = data.p;
+    this.platform.log.info(`[${this.displayName}] Measured Air Pressure ->`, this.uranusStates.Pressure, 'hPa');
     this.uranusStates.Temperature = data.t;
+    this.platform.log.info(`[${this.displayName}] Measured Temperature ->`, this.uranusStates.Temperature, '°C');
     this.uranusStates.Voc = data.v;
+    this.platform.log.info(`[${this.displayName}] Measured VOC Density ->`, this.uranusStates.Voc, 'µg/m³');
 
     this.platform.log.debug(`[${this.displayName}] Updating Characteristic Pressure ->`, data.p);
     this.temperatureService.updateCharacteristic(this.platform.Characteristic.AirPressureLevel, await this.getAirPressure());

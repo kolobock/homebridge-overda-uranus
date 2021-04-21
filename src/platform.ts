@@ -30,7 +30,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
     });
     this.Characteristic = Object.defineProperty(this.api.hap.Characteristic, 'AirPressureLevel', {value: this.AirPressureLevel});
     // FIXME: need to properly define PropertyDescriptor for AirPressureLevel
-    Object.defineProperties(this.Characteristic, { 'AirPressureLevel': {value: this.AirPressureLevel} });
+    // Object.defineProperties(this.Characteristic, { 'AirPressureLevel': {value: this.AirPressureLevel} });
   }
 
   configureAccessory(accessory: PlatformAccessory) {
@@ -46,23 +46,37 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
       const uuid = this.api.hap.uuid.generate(sensor.serialNumber);
       const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
 
+      this.setDisplayName(sensor);
+
       if (existingAccessory) {
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
         existingAccessory.context.sensor = sensor;
-        this.api.updatePlatformAccessories([existingAccessory]);
+        existingAccessory.displayName = sensor.displayName;
 
-        new UranusPlatformAccessory(this, existingAccessory);
+        try {
+          new UranusPlatformAccessory(this, existingAccessory);
+          this.api.updatePlatformAccessories([existingAccessory]);
+        } catch (error) {
+          this.log.error(`[${sensor.displayName}] has failed to updatePlatformAccessories:`, error.message);
+        }
       } else {
         this.log.info('Adding new accessory:', sensor.displayName);
 
         const accessory = new this.api.platformAccessory(sensor.displayName, uuid);
         accessory.context.sensor = sensor;
 
-        new UranusPlatformAccessory(this, accessory);
-
-        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+        try {
+          new UranusPlatformAccessory(this, accessory);
+          this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+        } catch (error) {
+          this.log.error(`[${sensor.displayName}] has failed to registerPlatformAccessory:`, error.message);
+        }
       }
     }
+  }
+
+  setDisplayName(sensor) {
+    sensor.displayName = sensor.displayName || sensor.serialNumber;
   }
 }
