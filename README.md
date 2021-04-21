@@ -46,6 +46,5 @@ Humidity sensor data
 Battery Level sensor data
 <img width="801" alt="Battery Sensor data" src="https://user-images.githubusercontent.com/871452/115158041-f02cbd80-a094-11eb-92eb-0143c064e292.png">
 
-
 ### Uranus DB json response example
     {"b":0.98,"h":47,"p":1012,"t":23.53,"v":92}
