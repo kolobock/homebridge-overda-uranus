@@ -11,7 +11,9 @@
     
 [![npm](https://img.shields.io/npm/v/homebridge-overda-uranus/latest?label=latest)](https://www.npmjs.com/package/homebridge-overda-uranus)
 [![npm](https://img.shields.io/npm/dt/homebridge-overda-uranus)](https://www.npmjs.com/package/homebridge-overda-uranus)
+
 [![Build and Lint](https://github.com/kolobock/homebridge-overda-uranus/actions/workflows/build.yml/badge.svg)](https://github.com/kolobock/homebridge-overda-uranus/actions/workflows/build.yml)
+[![Known Vulnerabilities](https://snyk.io/test/github/kolobock/homebridge-overda-uranus/badge.svg?targetFile=package.json)](https://snyk.io/test/github/kolobock/homebridge-overda-uranus?targetFile=package.json)
 
 </span>
 
