@@ -1,5 +1,13 @@
 # Change Log
 
+## v2.2.1 (2021-06-12)
+
+### Code improvements
+#### catch exceptions on plugin discovering start
+#### Upgrade npm modules to fix vulnerabilities
+
+### Update README
+
 ## v2.1.3 (2021-04-21)
 
 ### Code improvements
