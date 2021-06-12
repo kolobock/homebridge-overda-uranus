@@ -1,10 +1,11 @@
 # Change Log
 
-## v2.2.1 (2021-06-12)
+## v2.2.2 (2021-06-12)
 
 ### Code improvements
 #### catch exceptions on plugin discovering start
 #### Upgrade npm modules to fix vulnerabilities
+#### use proxy variable to carry UranusDataFormat
 
 ### Update README
 
