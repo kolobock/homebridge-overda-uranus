@@ -183,7 +183,6 @@ export class UranusPlatformAccessory {
   }
 
   async updateStates(): Promise<void> {
-    let data: UranusDataFormat;
     let tmpData;
     try {
       tmpData = await this.getSensorData();
@@ -196,7 +195,7 @@ export class UranusPlatformAccessory {
     if (!tmpData) {
       return;
     }
-    data = tmpData;
+    const data: UranusDataFormat = tmpData;
 
     this.uranusStates.Battery = data.b * 100;
     this.platform.log.info(`[${this.displayName}] Measured Battery Level ->`, this.uranusStates.Battery, '%');
