@@ -184,17 +184,19 @@ export class UranusPlatformAccessory {
 
   async updateStates(): Promise<void> {
     let data: UranusDataFormat;
+    let tmpData;
     try {
-      data = await this.getSensorData();
-      this.platform.log.debug(`[${this.displayName}] Received data:`, data);
+      tmpData = await this.getSensorData();
+      this.platform.log.debug(`[${this.displayName}] Received data:`, tmpData);
     } catch (error) {
       this.platform.log.warn(`[${this.displayName}] Got error retrieving data:`, error.message);
       return;
     }
 
-    if (!data) {
+    if (!tmpData) {
       return;
     }
+    data = tmpData;
 
     this.uranusStates.Battery = data.b * 100;
     this.platform.log.info(`[${this.displayName}] Measured Battery Level ->`, this.uranusStates.Battery, '%');
