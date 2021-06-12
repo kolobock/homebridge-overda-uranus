@@ -29,7 +29,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
       try {
         this.discoverSensors();
       } catch (error) {
-        this.log.error(`[${PLATFORM_NAME}] `${PLUGIN_NAME}` has failed to discoverSensors:`, error.message);
+        this.log.error(`[${PLATFORM_NAME}] ${PLUGIN_NAME} has failed to discoverSensors:`, error.message);
       }
     });
     this.Characteristic = Object.defineProperty(this.api.hap.Characteristic, 'AirPressureLevel', {value: this.AirPressureLevel});
