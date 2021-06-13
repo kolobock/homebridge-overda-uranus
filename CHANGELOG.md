@@ -1,5 +1,12 @@
 # Change Log
 
+## v2.2.3 (2021-06-13)
+
+### Plugin misc
+add Homebridge icon to README
+add homebridge:verified to README
+add funding with paypal option
+
 ## v2.2.2 (2021-06-12)
 
 ### Code improvements
