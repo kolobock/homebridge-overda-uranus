@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Homebridge Overda Uranus",
   "name": "homebridge-overda-uranus",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Exposes sensors data from Uranus air-monitor station.",
   "license": "Apache-2.0",
   "repository": {
@@ -13,8 +13,8 @@
     "url": "https://github.com/kolobock/homebridge-overda-uranus/issues"
   },
   "funding": {
-    "type" : "paypal",
-    "url" : "https://www.paypal.com/donate?business=K3PV3GRXDS4QL&item_name=Donate+to+kolobock%40homebridge-overda-uranus+&currency_code=USD"
+    "type": "paypal",
+    "url": "https://www.paypal.com/donate?business=K3PV3GRXDS4QL&item_name=Donate+to+kolobock%40homebridge-overda-uranus+&currency_code=USD"
   },
   "engines": {
     "node": ">=10.17.0",
