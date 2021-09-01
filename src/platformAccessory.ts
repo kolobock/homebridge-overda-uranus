@@ -1,6 +1,6 @@
 import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { OverdaHomebridgePlatform } from './platform';
-import { OverdaDataFormat } from './overda/overdaInterfaces';
+import { OverdaDataFormat, OverdaStates } from './overda/overdaInterfaces';
 
 import https from 'https';
 
@@ -11,12 +11,12 @@ export class OverdaPlatformAccessory {
   private humidityService: Service;
   private batteryService: Service;
 
-  private overdaStates = {
-    Battery: 0,
-    Humidity: 0,
-    Pressure: 800,
-    Voc: 0,
-    Temperature: 0,
+  private overdaStates: OverdaStates = {
+    Battery: NaN,
+    Humidity: NaN,
+    Pressure: NaN,
+    Voc: NaN,
+    Temperature: NaN,
   };
 
   private category: number = this.platform.api.hap.Categories.SENSOR;
@@ -117,7 +117,7 @@ export class OverdaPlatformAccessory {
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic BatteryLevel ->`, batteryLevel);
 
-    return batteryLevel;
+    return this.promise(batteryLevel);
   }
 
   async getTemperature(): Promise<CharacteristicValue> {
@@ -125,7 +125,7 @@ export class OverdaPlatformAccessory {
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic Temperature ->`, temperature);
 
-    return temperature;
+    return this.promise(temperature);
   }
 
   async getVoc(): Promise<CharacteristicValue> {
@@ -133,7 +133,7 @@ export class OverdaPlatformAccessory {
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic VocDensity ->`, voc);
 
-    return voc;
+    return this.promise(voc);
   }
 
   async getAirPressure(): Promise<CharacteristicValue> {
@@ -141,7 +141,7 @@ export class OverdaPlatformAccessory {
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic Pressure ->`, pressure);
 
-    return pressure;
+    return this.promise(pressure);
   }
 
   async getHumidity(): Promise<CharacteristicValue> {
@@ -149,7 +149,7 @@ export class OverdaPlatformAccessory {
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic Humidity ->`, humidity);
 
-    return humidity;
+    return this.promise(humidity);
   }
 
   getSensorData(): Promise<OverdaDataFormat> {
@@ -239,5 +239,11 @@ export class OverdaPlatformAccessory {
     }
 
     return 'Retus';
+  }
+
+  promise(param: number): Promise<CharacteristicValue> {
+    return new Promise((resolve, reject) => {
+      isNaN(param) ? reject(param) : resolve(param);
+    });
   }
 }
