@@ -1,5 +1,8 @@
 # Change Log
 
+## v3.0.1 (2021-09-01)
+Update overda picture in README
+
 ## v3.0.0 (2021-09-01)
 
 ### Breaking changes
