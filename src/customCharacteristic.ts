@@ -13,7 +13,7 @@ export = (homebridge) => {
         minValue: 800,
         maxValue: 1200,
         minStep: 0.5,
-        perms: [Perms.READ, Perms.NOTIFY],
+        perms: [Perms.PAIRED_READ, Perms.NOTIFY],
       });
       this.value = this.getDefaultValue();
     }
