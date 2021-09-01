@@ -170,6 +170,10 @@ export class OverdaPlatformAccessory {
         });
         res.on('end', () => {
           const parsedData: OverdaDataFormat = JSON.parse(rawData);
+          if(parsedData['error'] !== undefined) {
+            reject(new Error(parsedData['error']));
+          }
+
           resolve(parsedData);
         });
       }).on('error', (error) => {
@@ -230,7 +234,7 @@ export class OverdaPlatformAccessory {
   }
 
   detectModel(): string {
-    if (this.accessory.context.sensor.serialNumber.indexOf('URN-') > 0) {
+    if (this.accessory.context.sensor.serialNumber.indexOf('URN') >= 0) {
       return 'Uranus';
     }
 
