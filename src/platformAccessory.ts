@@ -1,22 +1,17 @@
 import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-import { UranusHomebridgePlatform } from './platform';
+import { OverdaHomebridgePlatform } from './platform';
+import { OverdaDataFormat } from './overda/overdaInterfaces';
+
 import https from 'https';
 
-declare interface UranusDataFormat {
-  b: number; // battery level: 0.1-1
-  h: number; // humidity: 0-100%
-  p: number; // atmospheric air pressure: 800-1200 hPa
-  t: number; // temperature: -273-100 °C
-  v: number; // VOC density: 0-500 µg/m³
-}
-
-export class UranusPlatformAccessory {
+// OverdaPlatformAccessory defines all necessary methods to serve data from Retus or Uranus overda sensors
+export class OverdaPlatformAccessory {
   private service: Service;
   private temperatureService: Service;
   private humidityService: Service;
   private batteryService: Service;
 
-  private uranusStates = {
+  private overdaStates = {
     Battery: 0,
     Humidity: 0,
     Pressure: 800,
@@ -27,18 +22,20 @@ export class UranusPlatformAccessory {
   private category: number = this.platform.api.hap.Categories.SENSOR;
   private displayName: string;
   private updateInterval: number;
+  private model: string;
 
   constructor(
-    private readonly platform: UranusHomebridgePlatform,
+    private readonly platform: OverdaHomebridgePlatform,
     private readonly accessory: PlatformAccessory,
   ) {
     this.displayName = accessory.context.sensor.displayName;
     this.updateInterval = parseInt(this.platform.config.updateInterval) || 150;
     this.platform.log.info(`[${this.displayName}] Update Interval:`, this.updateInterval, 's');
+    this.model = this.detectModel();
 
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Overda')
-      .setCharacteristic(this.platform.Characteristic.Model, 'Uranus')
+      .setCharacteristic(this.platform.Characteristic.Model, this.model)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, 'v1')
       .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.sensor.serialNumber);
 
@@ -79,7 +76,7 @@ export class UranusPlatformAccessory {
   }
 
   async getIAQ(): Promise<CharacteristicValue> {
-    const voc: number = this.uranusStates.Voc;
+    const voc: number = this.overdaStates.Voc;
     let IAQ: number;
 
     if (voc <= 50) {
@@ -104,7 +101,7 @@ export class UranusPlatformAccessory {
   async getBattery(): Promise<CharacteristicValue> {
     let batteryLevel: number;
 
-    if (this.uranusStates.Battery < 20) {
+    if (this.overdaStates.Battery < 20) {
       batteryLevel = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
     } else {
       batteryLevel = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
@@ -116,7 +113,7 @@ export class UranusPlatformAccessory {
   }
 
   async getBatteryLevel(): Promise<CharacteristicValue> {
-    const batteryLevel: number = this.uranusStates.Battery;
+    const batteryLevel: number = this.overdaStates.Battery;
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic BatteryLevel ->`, batteryLevel);
 
@@ -124,7 +121,7 @@ export class UranusPlatformAccessory {
   }
 
   async getTemperature(): Promise<CharacteristicValue> {
-    const temperature: number = this.uranusStates.Temperature;
+    const temperature: number = this.overdaStates.Temperature;
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic Temperature ->`, temperature);
 
@@ -132,7 +129,7 @@ export class UranusPlatformAccessory {
   }
 
   async getVoc(): Promise<CharacteristicValue> {
-    const voc: number = this.uranusStates.Voc;
+    const voc: number = this.overdaStates.Voc;
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic VocDensity ->`, voc);
 
@@ -140,7 +137,7 @@ export class UranusPlatformAccessory {
   }
 
   async getAirPressure(): Promise<CharacteristicValue> {
-    const pressure: number = this.uranusStates.Pressure;
+    const pressure: number = this.overdaStates.Pressure;
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic Pressure ->`, pressure);
 
@@ -148,15 +145,15 @@ export class UranusPlatformAccessory {
   }
 
   async getHumidity(): Promise<CharacteristicValue> {
-    const humidity: number = this.uranusStates.Humidity;
+    const humidity: number = this.overdaStates.Humidity;
 
     this.platform.log.debug(`[${this.displayName}] Get Characteristic Humidity ->`, humidity);
 
     return humidity;
   }
 
-  getSensorData(): Promise<UranusDataFormat> {
-    const overdaUrl: string = 'https://overda-database.firebaseio.com/Devices/Uranus/' +
+  getSensorData(): Promise<OverdaDataFormat> {
+    const overdaUrl: string = `https://overda-database.firebaseio.com/Devices/${this.model}/` +
                               this.accessory.context.sensor.serialNumber +
                               '-' +
                               this.accessory.context.sensor.pass +
@@ -172,7 +169,7 @@ export class UranusPlatformAccessory {
           rawData += data;
         });
         res.on('end', () => {
-          const parsedData: UranusDataFormat = JSON.parse(rawData);
+          const parsedData: OverdaDataFormat = JSON.parse(rawData);
           resolve(parsedData);
         });
       }).on('error', (error) => {
@@ -195,18 +192,18 @@ export class UranusPlatformAccessory {
     if (!tmpData) {
       return;
     }
-    const data: UranusDataFormat = tmpData;
+    const data: OverdaDataFormat = tmpData;
 
-    this.uranusStates.Battery = data.b * 100;
-    this.platform.log.info(`[${this.displayName}] Measured Battery Level ->`, this.uranusStates.Battery, '%');
-    this.uranusStates.Humidity = data.h;
-    this.platform.log.info(`[${this.displayName}] Measured Humidity ->`, this.uranusStates.Humidity, '%');
-    this.uranusStates.Pressure = data.p;
-    this.platform.log.info(`[${this.displayName}] Measured Air Pressure ->`, this.uranusStates.Pressure, 'hPa');
-    this.uranusStates.Temperature = data.t;
-    this.platform.log.info(`[${this.displayName}] Measured Temperature ->`, this.uranusStates.Temperature, '°C');
-    this.uranusStates.Voc = data.v;
-    this.platform.log.info(`[${this.displayName}] Measured VOC Density ->`, this.uranusStates.Voc, 'µg/m³');
+    this.overdaStates.Battery = data.b * 100;
+    this.platform.log.info(`[${this.displayName}] Measured Battery Level ->`, this.overdaStates.Battery, '%');
+    this.overdaStates.Humidity = data.h;
+    this.platform.log.info(`[${this.displayName}] Measured Humidity ->`, this.overdaStates.Humidity, '%');
+    this.overdaStates.Pressure = data.p;
+    this.platform.log.info(`[${this.displayName}] Measured Air Pressure ->`, this.overdaStates.Pressure, 'hPa');
+    this.overdaStates.Temperature = data.t;
+    this.platform.log.info(`[${this.displayName}] Measured Temperature ->`, this.overdaStates.Temperature, '°C');
+    this.overdaStates.Voc = data.v;
+    this.platform.log.info(`[${this.displayName}] Measured VOC Density ->`, this.overdaStates.Voc, 'µg/m³');
 
     this.platform.log.debug(`[${this.displayName}] Updating Characteristic Pressure ->`, data.p);
     this.temperatureService.updateCharacteristic(this.platform.Characteristic.AirPressureLevel, await this.getAirPressure());
@@ -230,5 +227,13 @@ export class UranusPlatformAccessory {
     const LowBatt: CharacteristicValue = await this.getBattery();
     this.platform.log.debug(`[${this.displayName}] Updating Characteristic StatusLowBattery ->`, LowBatt);
     this.batteryService.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, LowBatt);
+  }
+
+  detectModel(): string {
+    if (this.accessory.context.sensor.serialNumber.indexOf('URN-') > 0) {
+      return 'Uranus';
+    }
+
+    return 'Retus';
   }
 }

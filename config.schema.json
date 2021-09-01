@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "OverdaUranus",
+  "pluginAlias": "OverdaAirMonitor",
   "pluginType": "platform",
   "singular": true,
   "schema": {
@@ -9,7 +9,7 @@
         "title": "Name",
         "type": "string",
         "required": false,
-        "default": "OverdaUranus"
+        "default": "OverdaAirMonitor"
       },
       "updateInterval": {
         "title": "Update Interval",
@@ -20,17 +20,17 @@
         "maximum": 300
       },
       "sensors": {
-        "title": "Uranus Sensors list",
+        "title": "Overda Sensors list",
         "type": "array",
         "required": true,
         "items": {
-          "title": "Air Monitor Sensor",
+          "title": "Air Monitor Sensor (Retus or Uranus)",
           "type": "object",
           "properties": {
             "serialNumber": {
               "title": "Serial Number",
               "type": "string",
-              "placeholder": "URN-000000",
+              "placeholder": "RTS-000000 or URN-000000",
               "required": true
             },
             "pass": {
@@ -45,7 +45,8 @@
               "title": "Display Name",
               "type": "string",
               "required": false,
-              "default": "Uranus"
+              "placeholder": "Retus or Uranus",
+              "default": "Retus"
             }
           }
         }

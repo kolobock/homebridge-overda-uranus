@@ -1,3 +1,7 @@
+/**
+ * customCharacteristic allows to observe Air Pressure level in Homebridge Web page
+ * this is not visible in Homebridge application though because Apple does not support AirPressure Characteristic
+ */
 import { Formats, Perms } from 'homebridge';
 
 export = (homebridge) => {
@@ -10,8 +14,8 @@ export = (homebridge) => {
       super('Air Pressure', AirPressureLevel.UUID, {
         format: Formats.UINT16,
         unit: 'mbar',
-        minValue: 800,
-        maxValue: 1200,
+        minValue: 700,
+        maxValue: 1300,
         minStep: 0.5,
         perms: [Perms.PAIRED_READ, Perms.NOTIFY],
       });

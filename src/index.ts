@@ -1,8 +1,8 @@
 import { API } from 'homebridge';
 
 import { PLATFORM_NAME } from './settings';
-import { UranusHomebridgePlatform } from './platform';
+import { OverdaHomebridgePlatform } from './platform';
 
 export = (api: API) => {
-  api.registerPlatform(PLATFORM_NAME, UranusHomebridgePlatform);
+  api.registerPlatform(PLATFORM_NAME, OverdaHomebridgePlatform);
 };

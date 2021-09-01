@@ -1,13 +1,14 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
-import { UranusPlatformAccessory } from './platformAccessory';
+import { OverdaPlatformAccessory } from './platformAccessory';
 
-import AirPressure = require('./customCharacteristic');
+import { OverdaSensor } from './overda/overdaInterfaces';
+import AirPressure = require('./overda/customCharacteristic');
 
 let IAirPressureLevel;
 
-export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
+export class OverdaHomebridgePlatform implements DynamicPlatformPlugin {
   private AirPressureLevel;
   public readonly Service: typeof Service = this.api.hap.Service;
   public Characteristic: typeof Characteristic & typeof IAirPressureLevel;
@@ -32,6 +33,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
         this.log.error(`[${PLATFORM_NAME}] ${PLUGIN_NAME} has failed to discoverSensors:`, error.message);
       }
     });
+    // Extends Characteristic for hap with custom AirPressureLevel.
     this.Characteristic = Object.defineProperty(this.api.hap.Characteristic, 'AirPressureLevel', {value: this.AirPressureLevel});
   }
 
@@ -42,9 +44,9 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
   }
 
   discoverSensors() {
-    const uranusSensors = this.config.sensors;
+    const overdaSensors: Array<OverdaSensor> = this.config.sensors;
 
-    for (const sensor of uranusSensors) {
+    for (const sensor of overdaSensors) {
       const uuid = this.api.hap.uuid.generate(sensor.serialNumber);
       const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
 
@@ -57,7 +59,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
         existingAccessory.displayName = sensor.displayName;
 
         try {
-          new UranusPlatformAccessory(this, existingAccessory);
+          new OverdaPlatformAccessory(this, existingAccessory);
           this.api.updatePlatformAccessories([existingAccessory]);
         } catch (error) {
           this.log.error(`[${sensor.displayName}] has failed to updatePlatformAccessories:`, error.message);
@@ -69,7 +71,7 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
         accessory.context.sensor = sensor;
 
         try {
-          new UranusPlatformAccessory(this, accessory);
+          new OverdaPlatformAccessory(this, accessory);
           this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
         } catch (error) {
           this.log.error(`[${sensor.displayName}] has failed to registerPlatformAccessory:`, error.message);
@@ -78,7 +80,8 @@ export class UranusHomebridgePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  setDisplayName(sensor) {
+  // setDisplayName sets displayName as per config value or serialNumber
+  setDisplayName(sensor: OverdaSensor) {
     sensor.displayName = sensor.displayName || sensor.serialNumber;
   }
 }
