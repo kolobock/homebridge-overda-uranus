@@ -1,5 +1,16 @@
 # Change Log
 
+## v3.0.0 (2021-09-01)
+
+### Breaking changes
+! Platform name ~OverdaUranus~ replaced with `OverdaAirMonitor`
+
+### Plugin support
+add support for Retus air monitor station
+
+### Code improvements
+update nodejs dependencies
+
 ## v2.2.3 (2021-06-13)
 
 ### Plugin misc
