@@ -189,7 +189,7 @@ export class OverdaPlatformAccessory {
       tmpData = await this.getSensorData();
       this.platform.log.debug(`[${this.displayName}] Received data:`, tmpData);
     } catch (error) {
-      this.platform.log.warn(`[${this.displayName}] Got error retrieving data:`, error.message);
+      this.platform.log.warn(`[${this.displayName}] Got error retrieving data:`, (error as Error).message);
       return;
     }
 

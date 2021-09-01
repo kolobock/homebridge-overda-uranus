@@ -30,7 +30,7 @@ export class OverdaHomebridgePlatform implements DynamicPlatformPlugin {
       try {
         this.discoverSensors();
       } catch (error) {
-        this.log.error(`[${PLATFORM_NAME}] ${PLUGIN_NAME} has failed to discoverSensors:`, error.message);
+        this.log.error(`[${PLATFORM_NAME}] ${PLUGIN_NAME} has failed to discoverSensors:`, (error as Error).message);
       }
     });
     // Extends Characteristic for hap with custom AirPressureLevel.
@@ -62,7 +62,7 @@ export class OverdaHomebridgePlatform implements DynamicPlatformPlugin {
           new OverdaPlatformAccessory(this, existingAccessory);
           this.api.updatePlatformAccessories([existingAccessory]);
         } catch (error) {
-          this.log.error(`[${sensor.displayName}] has failed to updatePlatformAccessories:`, error.message);
+          this.log.error(`[${sensor.displayName}] has failed to updatePlatformAccessories:`, (error as Error).message);
         }
       } else {
         this.log.info('Adding new accessory:', sensor.displayName);
@@ -74,7 +74,7 @@ export class OverdaHomebridgePlatform implements DynamicPlatformPlugin {
           new OverdaPlatformAccessory(this, accessory);
           this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
         } catch (error) {
-          this.log.error(`[${sensor.displayName}] has failed to registerPlatformAccessory:`, error.message);
+          this.log.error(`[${sensor.displayName}] has failed to registerPlatformAccessory:`, (error as Error).message);
         }
       }
     }
