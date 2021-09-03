@@ -10,6 +10,7 @@ export class OverdaPlatformAccessory {
   private temperatureService: Service;
   private humidityService: Service;
   private batteryService: Service;
+  private airPressureService: Service;
 
   private overdaStates: OverdaStates = {
     Battery: NaN,
@@ -39,9 +40,10 @@ export class OverdaPlatformAccessory {
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, 'v1')
       .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.sensor.serialNumber);
 
+    // Main AirQualitySensor service
     this.service = this.accessory.getService(this.platform.Service.AirQualitySensor) ||
       this.accessory.addService(this.platform.Service.AirQualitySensor, `IAQ ${this.displayName}`);
-
+    // Bind get values for main service
     this.service.getCharacteristic(this.platform.Characteristic.AirQuality)
       .onGet(this.getIAQ.bind(this));
     this.service.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
@@ -49,17 +51,17 @@ export class OverdaPlatformAccessory {
     this.service.getCharacteristic(this.platform.Characteristic.VOCDensity)
       .onGet(this.getVoc.bind(this));
 
+    // Linkes services list
     this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor) ||
       this.accessory.addService(this.platform.Service.TemperatureSensor, `Temperature ${this.displayName}`);
     this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor) ||
       this.accessory.addService(this.platform.Service.HumiditySensor, `Humidity ${this.displayName}`);
     this.batteryService = this.accessory.getService(this.platform.Service.Battery) ||
       this.accessory.addService(this.platform.Service.Battery, `Battery level ${this.displayName}`);
-    (this.temperatureService.getCharacteristic(this.platform.Characteristic.AirPressureLevel) ||
-     this.temperatureService.addOptionalCharacteristic(this.platform.Characteristic.AirPressureLevel))
-      .onGet(this.getAirPressure.bind(this));
-    this.service.linkedServices = [this.temperatureService, this.humidityService, this.batteryService];
-
+    // Custom AirPressure service
+    this.airPressureService = this.accessory.getService(this.platform.Service.OccupancySensor) ||
+      this.accessory.addService(this.platform.Service.OccupancySensor, `Air Pressure ${this.displayName}`);
+    // Bind get values for linked services
     this.temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
       .onGet(this.getTemperature.bind(this));
     this.humidityService.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
@@ -68,6 +70,16 @@ export class OverdaPlatformAccessory {
       .onGet(this.getBattery.bind(this));
     this.batteryService.getCharacteristic(this.platform.Characteristic.BatteryLevel)
       .onGet(this.getBatteryLevel.bind(this));
+    // Bind get values for custom characteristic AirPressure
+    (this.temperatureService.getCharacteristic(this.platform.Characteristic.AirPressureLevel) ||
+      this.temperatureService.addOptionalCharacteristic(this.platform.Characteristic.AirPressureLevel))
+      .onGet(this.getAirPressure.bind(this));
+    (this.airPressureService.getCharacteristic(this.platform.Characteristic.AirPressureLevel) ||
+      this.airPressureService.addCharacteristic(this.platform.Characteristic.AirPressureLevel))
+      .onGet(this.getAirPressure.bind(this));
+
+    // Link services to main service
+    this.service.linkedServices = [this.temperatureService, this.humidityService, this.batteryService, this.airPressureService];
 
     setInterval(() => {
       this.updateStates();
@@ -210,7 +222,15 @@ export class OverdaPlatformAccessory {
     this.platform.log.info(`[${this.displayName}] Measured VOC Density ->`, this.overdaStates.Voc, 'µg/m³');
 
     this.platform.log.debug(`[${this.displayName}] Updating Characteristic Pressure ->`, data.p);
-    this.temperatureService.updateCharacteristic(this.platform.Characteristic.AirPressureLevel, await this.getAirPressure());
+    const airPressure: CharacteristicValue = await this.getAirPressure();
+    if (airPressure !== undefined) {
+      this.temperatureService.updateCharacteristic(this.platform.Characteristic.AirPressureLevel, airPressure);
+      this.airPressureService.updateCharacteristic(this.platform.Characteristic.AirPressureLevel, airPressure);
+      this.airPressureService.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, airPressure >= 1000);
+      this.airPressureService.updateCharacteristic(
+        this.platform.Characteristic.Name,
+        `${airPressure} mbar ${this.displayName} Air Pressure`);
+    }
 
     this.platform.log.debug(`[${this.displayName}] Updating Characteristic Battery Level ->`, data.b);
     this.batteryService.updateCharacteristic(this.platform.Characteristic.BatteryLevel, await this.getBatteryLevel());
