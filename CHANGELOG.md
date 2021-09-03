@@ -1,5 +1,15 @@
 # Change Log
 
+## v4.0.0 (2021-09-04)
+
+### Code improvements
+
+* Show Air Pressure Level as value for Occupancy sensor
+
+### Misc
+
+* add npm package publish-related scripts
+
 ## v3.1.0 (2021-09-01)
 
 ### Code improvements
