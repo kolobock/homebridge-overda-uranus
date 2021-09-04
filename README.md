@@ -48,20 +48,27 @@ sudo npm install -g homebridge-overda-uranus
     }
 
 ## Plugin pictures
-All sensors
-<img width="681" alt="All Overda Sensors" src="https://user-images.githubusercontent.com/871452/115157889-4816f480-a094-11eb-8a64-f0b49fba97ac.png">
+All sensors<br>
+<img width="853" alt="All Overda Sensors" src="https://user-images.githubusercontent.com/871452/132109938-89320e05-9993-4416-95ff-2f4d8e2a6f43.png">
 
-IAQ sensor data
+IAQ sensor data<br>
 <img width="801" alt="IAQ Sensor data" src="https://user-images.githubusercontent.com/871452/115158001-b6f44d80-a094-11eb-8e1d-92623c37472b.png">
 
-Temperature sensor data
+Temperature sensor data<br>
 <img width="795" alt="Temperature Sensor data" src="https://user-images.githubusercontent.com/871452/115157845-0b4afd80-a094-11eb-8f6c-d698ee46dd13.png">
 
-Humidity sensor data
+Humidity sensor data<br>
 <img width="798" alt="Humidity Sensor data" src="https://user-images.githubusercontent.com/871452/115158019-d55a4900-a094-11eb-9ac0-5ed33cf96a8a.png">
 
-Battery Level sensor data
+Battery Level sensor data<br>
 <img width="801" alt="Battery Sensor data" src="https://user-images.githubusercontent.com/871452/115158041-f02cbd80-a094-11eb-92eb-0143c064e292.png">
+
+Air Pressure Level sensor data<br>
+<img width="812" alt="Air Pressure Level Sensor data" src="https://user-images.githubusercontent.com/871452/132109983-610a9061-4123-43c9-b28f-030fcca4199f.png">
+
+No data sensors<br>
+<img width="860" alt="No data NaN" src="https://user-images.githubusercontent.com/871452/132110018-2cf986ab-8b5d-4d29-a7f3-5bd55a616d1a.png">
+
 
 ### Overda DB json response example
     {"b":0.98,"h":47,"p":1012,"t":23.53,"v":92}
