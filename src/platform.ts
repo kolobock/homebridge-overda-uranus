@@ -55,27 +55,38 @@ export class OverdaHomebridgePlatform implements DynamicPlatformPlugin {
       if (existingAccessory) {
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
-        existingAccessory.context.sensor = sensor;
-        existingAccessory.displayName = sensor.displayName;
-
-        try {
-          new OverdaPlatformAccessory(this, existingAccessory);
-          this.api.updatePlatformAccessories([existingAccessory]);
-        } catch (error) {
-          this.log.error(`[${sensor.displayName}] has failed to updatePlatformAccessories:`, (error as Error).message);
+        if (existingAccessory.displayName === sensor.displayName) {
+          existingAccessory.context.sensor = sensor;
+          try {
+            new OverdaPlatformAccessory(this, existingAccessory);
+            this.api.updatePlatformAccessories([existingAccessory]);
+          } catch (error) {
+            this.log.error(`[${sensor.displayName}] has failed to updatePlatformAccessories:`, (error as Error).message);
+          }
+          continue;
         }
-      } else {
-        this.log.info('Adding new accessory:', sensor.displayName);
 
-        const accessory = new this.api.platformAccessory(sensor.displayName, uuid);
-        accessory.context.sensor = sensor;
-
+        // unregister cached accessory if name from config not identical
         try {
-          new OverdaPlatformAccessory(this, accessory);
-          this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+          // new OverdaPlatformAccessory(this, existingAccessory);
+          this.log.info('Unregistering existing accessory:', `${existingAccessory.displayName} -> ${sensor.displayName}`);
+          this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+          // delete(this.accessories, existingAccessory);
         } catch (error) {
-          this.log.error(`[${sensor.displayName}] has failed to registerPlatformAccessory:`, (error as Error).message);
+          this.log.error(`[${sensor.displayName}] has failed to unregisterPlatformAccessories:`, (error as Error).message);
         }
+      }
+
+      this.log.info('Adding new accessory:', sensor.displayName);
+
+      const accessory = new this.api.platformAccessory(sensor.displayName, uuid);
+      accessory.context.sensor = sensor;
+
+      try {
+        new OverdaPlatformAccessory(this, accessory);
+        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      } catch (error) {
+        this.log.error(`[${sensor.displayName}] has failed to registerPlatformAccessory:`, (error as Error).message);
       }
     }
   }
