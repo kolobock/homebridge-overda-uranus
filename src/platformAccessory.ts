@@ -81,6 +81,7 @@ export class OverdaPlatformAccessory {
     // Link services to main service
     this.service.linkedServices = [this.temperatureService, this.humidityService, this.batteryService, this.airPressureService];
 
+    // Start auto-refresh states
     setInterval(() => {
       this.updateStates();
     }, this.updateInterval * 1000);
