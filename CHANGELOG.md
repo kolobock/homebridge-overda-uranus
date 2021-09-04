@@ -1,5 +1,17 @@
 # Change Log
 
+## v4.1.0 (2021-09-05)
+
+### Code improvements
+
+* Udate sensor display name if changed in config
+
+### Misc
+
+* update pictures in README
+* add codeql analysis
+* add njsscan analysis
+
 ## v4.0.0 (2021-09-04)
 
 ### Code improvements
