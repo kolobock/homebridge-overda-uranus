@@ -1,7 +1,7 @@
 
 <p align="center">
   <a href="https://homebridge.io" title="Homebridge Verified" target="_blank"><img alt="Homebridge Verified" src="https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-color-round-stylized.png" height="120"></a>
-  <a href="https://overda.one" title="Homebridge Verified" target="_blank"><img src="https://overda.one/images/Overda%20Red%20Logo.png" height="140"></a>
+  <a href="https://overda.one" title="Homebridge Verified" target="_blank"><img src="https://overda.one/images/Overda%20Red%20Logo.png" height="120"></a>
 </p>
 
 # Overda Uranus/Retus Homebridge Platform Plugin
