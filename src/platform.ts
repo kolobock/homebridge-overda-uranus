@@ -68,17 +68,14 @@ export class OverdaHomebridgePlatform implements DynamicPlatformPlugin {
 
         // unregister cached accessory if name from config not identical
         try {
-          // new OverdaPlatformAccessory(this, existingAccessory);
           this.log.info('Unregistering existing accessory:', `${existingAccessory.displayName} -> ${sensor.displayName}`);
           this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-          // delete(this.accessories, existingAccessory);
         } catch (error) {
           this.log.error(`[${sensor.displayName}] has failed to unregisterPlatformAccessories:`, (error as Error).message);
         }
       }
 
       this.log.info('Adding new accessory:', sensor.displayName);
-
       const accessory = new this.api.platformAccessory(sensor.displayName, uuid);
       accessory.context.sensor = sensor;
 
