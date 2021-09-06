@@ -1,5 +1,11 @@
 # Change Log
 
+## UNRELEASED
+
+### Misc
+
+* remove commented lines of code (code cleanup)
+
 ## v4.1.0 (2021-09-05)
 
 ### Code improvements
