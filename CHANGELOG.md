@@ -5,6 +5,7 @@
 ### Misc
 
 * remove commented lines of code (code cleanup)
+* bump deep-is v0.1.3 -> v0.1.4 node module
 
 ## v4.1.0 (2021-09-05)
 
