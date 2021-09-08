@@ -7,6 +7,14 @@
 * remove commented lines of code (code cleanup)
 * bump deep-is v0.1.3 -> v0.1.4 node module
 * remove njsscan analysis from repo
+* add contributing to repo
+* add code of conduct to repo
+* bump actions/setup-node from 1 to 2.4.0
+* bump @types/node from 14.17.14 to 16.7.13
+* bump ts-node from 9.1.1 to 10.2.1
+* bump @typescript-eslint/parser from 4.30.0 to 4.31.0
+* bump @typescript-eslint/eslint-plugin from 4.30.0 to 4.31.0
+* bump typescript other dependencies
 
 
 ## v4.1.0 (2021-09-05)
