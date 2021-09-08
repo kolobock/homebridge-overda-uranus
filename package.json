@@ -26,9 +26,9 @@
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run lint && npm run build",
-    "publishMajor": "npm version major && npm run prepublishOnly && npm publish",
-    "publishMinor": "npm version minor && npm run prepublishOnly && npm publish",
-    "publishPatch": "npm version patch && npm run prepublishOnly && npm publish"
+    "publishMajor": "npm version major && npm publish",
+    "publishMinor": "npm version minor && npm publish",
+    "publishPatch": "npm version patch && npm publish"
   },
   "keywords": [
     "homebridge-plugin",
