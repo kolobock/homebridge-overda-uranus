@@ -10,11 +10,12 @@
 * add contributing to repo
 * add code of conduct to repo
 * bump actions/setup-node from 1 to 2.4.0
-* bump @types/node from 14.17.14 to 16.7.13
+* bump @types/node from 14.17.14 to 16.9.6
 * bump ts-node from 9.1.1 to 10.2.1
 * bump @typescript-eslint/parser from 4.30.0 to 4.31.2
 * bump @typescript-eslint/eslint-plugin from 4.30.0 to 4.31.2
 * bump typescript from 4.4.2 to 4.4.3
+* bump ansi-regex-5.0.0 to 5.0.1 [CVE-2021-3807](https://github.com/advisories/GHSA-93q8-gq69-wqmw)
 * bump typescript other dependencies
 
 
