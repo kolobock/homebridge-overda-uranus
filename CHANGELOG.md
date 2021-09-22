@@ -12,8 +12,9 @@
 * bump actions/setup-node from 1 to 2.4.0
 * bump @types/node from 14.17.14 to 16.7.13
 * bump ts-node from 9.1.1 to 10.2.1
-* bump @typescript-eslint/parser from 4.30.0 to 4.31.0
-* bump @typescript-eslint/eslint-plugin from 4.30.0 to 4.31.0
+* bump @typescript-eslint/parser from 4.30.0 to 4.31.2
+* bump @typescript-eslint/eslint-plugin from 4.30.0 to 4.31.2
+* bump typescript from 4.4.2 to 4.4.3
 * bump typescript other dependencies
 
 
