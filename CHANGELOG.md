@@ -1,5 +1,12 @@
 # Change Log
 
+## Unreleased ()
+
+### Misc
+
+* Bump actions/setup-node from 2.4.0 to 2.4.1
+
+
 ## v4.1.1 (2021-09-23)
 
 ### Misc
