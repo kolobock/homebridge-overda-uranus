@@ -2,9 +2,14 @@
 
 ## Unreleased ()
 
+### Breaking Changes
+
+* remove support for Node 10.x
+
 ### Misc
 
 * Bump actions/setup-node from 2.4.0 to 2.4.1
+* update all npm modules by dependency VSC extension
 
 
 ## v4.1.1 (2021-09-23)
