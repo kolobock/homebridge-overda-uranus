@@ -3,7 +3,7 @@
 ## Unreleased ()
 
 
-## v4.2.0 (2021-11-22)
+## v4.2.1 (2021-11-22)
 
 ### Breaking Changes
 
