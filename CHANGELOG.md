@@ -2,14 +2,22 @@
 
 ## Unreleased ()
 
+
+## v4.2.0 (2021-11-22)
+
 ### Breaking Changes
 
-* remove support for Node 10.x
+* remove support for Node v10.x/v13.x/v15.x
 
 ### Misc
 
 * Bump actions/setup-node from 2.4.0 to 2.4.1
 * update all npm modules by dependency VSC extension
+* Bump homebridge from 1.3.5 to 1.3.6
+* Bump nodemon from 2.0.13 to 2.0.15
+* Bump ts-node from 10.2.1 to 10.4.0
+* Bump typescript from 4.4.3 to 4.5.2
+* Bump eslint from 7.32.0 to 8.3.0
 
 
 ## v4.1.1 (2021-09-23)
