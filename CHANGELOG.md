@@ -3,6 +3,19 @@
 ## Unreleased ()
 
 
+## v4.2.2 (2022-01-06)
+
+### Misc
+
+* Bump homebridge from 1.3.6 to 1.3.9
+* Bump typescript from 4.5.2 to 4.5.4
+* Bump actions/setup-node from 2.4.1 to 2.5.1
+* Bump eslint from 8.3.0 to 8.6.0
+* Bump @typescript-eslint/eslint-plugin from 5.4.0 to 5.9.0
+* Bump @typescript-eslint/parser from 5.4.0 to 5.9.0
+* Bump @types/node from 16.11.9 to 16.11.19
+
+
 ## v4.2.1 (2021-11-22)
 
 ### Breaking Changes
