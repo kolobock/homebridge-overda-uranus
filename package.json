@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Homebridge Overda Air Monitor",
   "name": "homebridge-overda-uranus",
-  "version": "4.2.1",
+  "version": "4.2.2",
   "description": "Exposes sensors data from Uranus or Retus air-monitor stations.",
   "license": "Apache-2.0",
   "repository": {
