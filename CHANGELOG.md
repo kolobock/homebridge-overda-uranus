@@ -3,6 +3,27 @@
 ## Unreleased ()
 
 
+## v5.0.0 (2022-08-26)
+
+### Breaking Changes:
+
+* Minimum supported `homebridge` version from v1.5.0
+* Minimum supported `node` version from v14.18.0 or v16.13.0 or v18.7.0
+ 
+### Misc
+
+* Bump @types/node from 16.11.19 to 16.11.21
+* Bump eslint from 8.6.0 to 8.7.0
+* Bump @typescript-eslint/eslint-plugin from 5.9.0 to 5.35.1
+* Bump @typescript-eslint/parser from 5.9.0 to 5.35.1
+* Bump homebridge from 1.3.9 to 1.5.0
+* Bump typescript from 4.5.2 to 4.8.2
+* Bump minimist from 1.2.5 to 1.2.6 
+* Bump actions/checkout from 2 to 3
+* Bump github/codeql-action from 1 to 2
+* Bump actions/setup-node from 2.5.1 to 3.4.1
+
+
 ## v4.2.2 (2022-01-06)
 
 ### Misc
