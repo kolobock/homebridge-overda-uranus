@@ -2,6 +2,23 @@
 
 ## Unreleased ()
 
+## v5.1.0 (2022-02-17)
+
+### What's Changed
+* Bump actions/setup-node from 3.4.1 to 3.6.0 by @dependabot in https://github.com/kolobock/homebridge-overda-uranus/pull/263
+* Bump nodemon from 2.0.19 to 2.0.20 by @dependabot in https://github.com/kolobock/homebridge-overda-uranus/pull/215
+* Bump typescript from 4.8.2 to 4.9.5 by @dependabot in https://github.com/kolobock/homebridge-overda-uranus/pull/273
+* Bump eslint from 8.22.0 to 8.34.0 by @dependabot in https://github.com/kolobock/homebridge-overda-uranus/pull/277
+* Bump @typescript-eslint/eslint-plugin from 5.35.1 to 5.52.0 by @dependabot in https://github.com/kolobock/homebridge-overda-uranus/pull/278
+* Bump @typescript-eslint/parser from 5.35.1 to 5.52.0 by @dependabot in https://github.com/kolobock/homebridge-overda-uranus/pull/279
+
+
+### Breaking Changes:
+
+* Minimum supported `node` version from v16.13.0 or v18.7.0
+
+**Full Changelog**: https://github.com/kolobock/homebridge-overda-uranus/compare/v5.0.1...v5.1.0
+
 
 ## v5.0.0 (2022-08-26)
 
